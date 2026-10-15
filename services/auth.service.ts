@@ -10,8 +10,7 @@ export const authService = {
       body: JSON.stringify(data),
     }),
   logout: () => api<void>(urls.auth.logout, { method: "POST" }),
-  me: (signal?: AbortSignal) =>
-    api<AuthUser>(urls.auth.me, { signal }),
+  me: (signal?: AbortSignal) => api<AuthUser>(urls.auth.me, { signal }),
   refresh: () => api<null>(urls.auth.refresh, { method: "POST" }),
   login: (data: LoginInput) =>
     api<null>(urls.auth.login, {

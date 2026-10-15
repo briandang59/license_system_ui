@@ -15,7 +15,7 @@ const items = [
     label: "Catalog management",
     children: [
       { key: "licenses", label: "Licenses", disabled: false },
-      { key: "products", label: "Products", disabled: false },
+      { key: "/products", label: <Link href="/products">Products</Link> },
       { key: "customers", label: "Customers", disabled: false },
     ],
   },
@@ -103,13 +103,26 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <Avatar style={{ backgroundColor: "#dbeafe", color: "#1d4ed8" }}>
               LS
             </Avatar>
-            <Button loading={logout.isPending} onClick={() => { if (!logout.isPending) logout.mutate(); }}>
+            <Button
+              loading={logout.isPending}
+              onClick={() => {
+                if (!logout.isPending) logout.mutate();
+              }}
+            >
               Sign out
             </Button>
           </div>
         </header>
-        <main id="main-content" className="mx-auto max-w-7xl p-5 sm:p-8">
-          {logout.isError && <div role="alert" className="mb-5"><Alert type="error" showIcon title={getApiErrorMessage(logout.error)} /></div>}
+        <main id="main-content" className="p-2 sm:p-4 bg-white min-h-screen">
+          {logout.isError && (
+            <div role="alert" className="mb-5">
+              <Alert
+                type="error"
+                showIcon
+                title={getApiErrorMessage(logout.error)}
+              />
+            </div>
+          )}
           {children}
         </main>
       </div>

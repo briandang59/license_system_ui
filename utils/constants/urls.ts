@@ -1,4 +1,8 @@
 export const urls = {
+  products: {
+    list: "/api/products",
+    detail: (id: number) => `/api/products/${id}`,
+  },
   auth: {
     login: "/api/auth/login",
     register: "/api/auth/register",

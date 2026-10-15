@@ -1,6 +1,10 @@
 import { ApiError } from "./api";
 
 const errorMessages: Record<string, string> = {
+  ALREADY_EXISTS: "A product with this code already exists.",
+  RESOURCE_IN_USE: "This product is in use and cannot be deleted.",
+  NOT_FOUND: "The requested record was not found.",
+  API_UNAVAILABLE: "The service is unavailable. Please try again later.",
   INVALID_CREDENTIALS: "Invalid email or password.",
   UNAUTHORIZED: "Please sign in to continue.",
   SESSION_EXPIRED: "Your session has expired. Please sign in again.",
