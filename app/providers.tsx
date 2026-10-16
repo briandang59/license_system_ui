@@ -39,6 +39,11 @@ export default function Providers({ children }: { children: ReactNode }) {
       token: {
         colorPrimary: dark ? "#c4a0f2" : "#167047",
         colorPrimaryActive: dark ? "#9b7cbd" : "#0b4a30",
+        colorPrimaryBg: dark ? "#3a294d" : "#e3f2e8",
+        colorPrimaryBgHover: dark ? "#49335f" : "#d5eadd",
+        controlItemBgActive: dark ? "#3a294d" : "#e3f2e8",
+        controlItemBgActiveHover: dark ? "#49335f" : "#d5eadd",
+        controlItemBgHover: dark ? "#2b2238" : "#edf5ef",
         colorBgBase: dark ? "#17121f" : "#ffffff",
         colorBgLayout: dark ? "#17121f" : "#f3f8f4",
         colorBgContainer: dark ? "#211a2c" : "#ffffff",
