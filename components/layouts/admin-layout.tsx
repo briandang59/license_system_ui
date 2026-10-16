@@ -15,7 +15,9 @@ const items = [
     children: [
       { key: "licenses", label: "Licenses", disabled: false },
       { key: "/products", label: <Link href="/products">Products</Link> },
-      { key: "customers", label: "Customers", disabled: false },
+      { key: "/companies", label: <Link href="/companies">Companies</Link> },
+      { key: "/plans", label: <Link href="/plans">Plans</Link> },
+      { key: "/features", label: <Link href="/features">Features</Link> },
     ],
   },
 ];
@@ -43,9 +45,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         onClick={() => setMenuOpen(false)}
         style={{ borderInlineEnd: 0 }}
       />
-      <p className="px-6 pt-6 text-xs leading-5 text-slate-400">
-        More catalog pages will be available as your workspace grows.
-      </p>
     </nav>
   );
 

@@ -1,8 +1,8 @@
 import { ApiError } from "./api";
 
 const errorMessages: Record<string, string> = {
-  ALREADY_EXISTS: "A product with this code already exists.",
-  RESOURCE_IN_USE: "This product is in use and cannot be deleted.",
+  ALREADY_EXISTS: "A record with this code already exists.",
+  RESOURCE_IN_USE: "This record is in use and cannot be deleted or changed.",
   NOT_FOUND: "The requested record was not found.",
   API_UNAVAILABLE: "The service is unavailable. Please try again later.",
   INVALID_CREDENTIALS: "Invalid email or password.",
@@ -12,7 +12,7 @@ const errorMessages: Record<string, string> = {
   LICENSE_EXPIRED: "Your license has expired.",
   LICENSE_NOT_FOUND: "License not found.",
   AUTH_UNAVAILABLE: "The authentication service is unavailable. Please try again later.",
-  VALIDATION_ERROR: "Enter a valid email and password.",
+  VALIDATION_ERROR: "Check the entered values and try again.",
 };
 
 export function getApiErrorMessage(error: unknown): string {

@@ -1,0 +1,56 @@
+"use client";
+
+import { Alert, Button } from "antd";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import FormInput from "@/components/form/form-input";
+import FormSelect from "@/components/form/form-select";
+import FormTextarea from "@/components/form/form-textarea";
+import ProductSelect from "@/features/products/product-select";
+import { getApiErrorMessage } from "@/lib/api-errors";
+import { planFormSchema, type Plan, type PlanForm as PlanFormValues } from "@/features/plans/schema";
+import { planService } from "@/features/plans/service";
+
+export function PlanForm({ plan, onSaved }: { plan?: Plan; onSaved: () => void }) {
+  const queryClient = useQueryClient();
+  const { control, handleSubmit } = useForm<PlanFormValues>({
+    resolver: zodResolver(planFormSchema),
+    defaultValues: {
+      code: plan?.code ?? "",
+      name: plan?.name ?? "",
+      description: plan?.description ?? "",
+      product_id: plan?.product_id,
+      status: plan?.status ?? "active",
+    },
+  });
+  const save = useMutation({
+    mutationFn: (data: PlanFormValues) => {
+      const payload = {
+        ...data,
+        description: data.description || null,
+      };
+      return plan
+        ? planService.update(plan.id, { name: payload.name, description: payload.description, status: payload.status })
+        : planService.create(payload);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["plans"] });
+      onSaved();
+    },
+  });
+  return (
+    <form noValidate onSubmit={handleSubmit((data) => { if (!save.isPending) save.mutate(data); })}>
+      <ProductSelect control={control} name="product_id" label="Product" productId={plan?.product_id} disabled={!!plan || save.isPending} />
+      <FormInput control={control} name="code" label="Code" disabled={!!plan || save.isPending} />
+      <FormInput control={control} name="name" label="Name" disabled={save.isPending} />
+      <FormTextarea control={control} name="description" label="Description" disabled={save.isPending} rows={3} />
+      <FormSelect control={control} name="status" label="Status" disabled={save.isPending}
+        options={[{ value: "active", label: "Active" }, { value: "inactive", label: "Inactive" }]} />
+      {save.isError && <div role="alert" className="mb-4"><Alert type="error" title={getApiErrorMessage(save.error)} /></div>}
+      <Button htmlType="submit" type="primary" loading={save.isPending} block>
+        {plan ? "Save changes" : "Create plan"}
+      </Button>
+    </form>
+  );
+}

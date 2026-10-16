@@ -60,6 +60,10 @@ features/
     service.ts
     urls.ts
     handler.ts
+    product-select.tsx
+  companies/              # page, form, columns, descriptions, schema, service, urls, handler
+  plans/                  # Cùng cấu trúc CRUD như companies
+  features/               # Quản lý feature của sản phẩm; cùng cấu trúc CRUD
 ```
 
 ### Quy tắc đặt file và chiều phụ thuộc
@@ -69,8 +73,12 @@ features/
 - Giữ file phẳng khi feature còn nhỏ. Handler luôn đặt tại `features/<domain>/handler.ts`, ngang hàng với `schema.ts`, `service.ts`, `urls.ts`; không tạo thư mục `server/` để bọc handler. Chỉ thêm thư mục con khác khi thực tế cần, không dựng sẵn thư mục rỗng, barrel export hoặc factory.
 - `components/`, `lib/`, `utils/` chứa phần dùng chung có trách nhiệm rõ ràng. Schema dùng cả client và server của cùng domain vẫn thuộc feature. Không tách type chỉ để lặp lại schema.
 - Cấu hình Table/Descriptions riêng của domain đặt trong feature: `columns.tsx` export hàm nhận callbacks/trạng thái thao tác, `descriptions.ts` export hàm nhận bản ghi và trả items. Dùng types `TableProps<T>["columns"]` và `DescriptionsProps["items"]` của Ant Design; file có JSX dùng `.tsx`. State, query, mutation và điều hướng giữ ở page/hook; cấu hình không tự gọi API. Không ép columns và items dùng chung một schema; chỉ đưa formatter/UI độc lập nghiệp vụ ra dùng chung khi có nhu cầu thực tế.
+- Bảng catalog hiển thị cột `#` tính bằng `offset + rowIndex + 1`; không hiển thị ID kỹ thuật (kể cả foreign key) ở Table/Descriptions. Vẫn dùng `id` cho `rowKey`, selection keys và gọi API; không thay bằng số thứ tự.
+- Bảng hỗ trợ checkbox chọn nhiều dòng qua `rowSelection` được điều khiển bằng state ở page. Xóa lựa chọn khi đổi trang/từ khóa hoặc xóa thành công; không tự thêm bulk action khi chưa có yêu cầu.
+- Tìm kiếm catalog chạy phía backend qua query `search`; service và handler trim rồi encode bằng `URLSearchParams`, không lọc riêng trang hiện tại. Query key chứa từ khóa đã áp dụng và offset; submit bằng Enter/nút tìm kiếm, clear để bỏ lọc và luôn reset offset về 0. Giữ truyền `AbortSignal` và trạng thái loading/empty/error/retry.
+- Actions View/Edit/Delete trong bảng dùng icon `Eye`/`Pencil`/`Trash2` từ `lucide-react`, không dùng text trong nút. Icon chỉ trang trí có `aria-hidden`; nút có `aria-label` theo bản ghi và `title` mô tả. Giữ xác nhận xóa, pending/disabled và điều hướng bàn phím. Các nút toolbar/phân trang có thể giữ label kèm icon Lucide; import trực tiếp icon cần dùng, không tạo icon registry.
 - Feature được import phần dùng chung; hạ tầng `lib/` và helper `utils/` không import ngược feature. Layout là điểm tích hợp được phép dùng hook/component auth; logic session thuộc `features/auth/`.
-- Không import chéo nội bộ giữa các feature hoặc tạo phụ thuộc vòng. Nếu cần chia sẻ thật, xác định phần dùng chung hoặc điểm tích hợp trước.
+- Không import chéo nội bộ giữa các feature hoặc tạo phụ thuộc vòng. Khi cần tích hợp, dùng component có trách nhiệm rõ: `features/products/product-select.tsx` là điểm tích hợp chọn product cho forms plan/feature; không import schema/service/handler products trực tiếp từ hai feature này.
 - Luồng trình duyệt: **feature UI/hook → feature service → `lib/api.ts` → `app/api/*` route → feature server handler → backend**.
 - Route API khai báo HTTP methods, đọc/kiểm tra route params hoặc action rồi gọi handler. Handler kiểm tra request/response, cookie và gọi backend; không đưa logic backend vào page.
 - Không gọi backend trực tiếp từ client hoặc import `features/*/handler.ts` vào client. Import trực tiếp đúng module; không gom module client và server vào một barrel. Server Component có thể gọi code server trực tiếp, không bắt gọi vòng qua API nội bộ.
@@ -97,6 +105,7 @@ features/
 - Backend fetch giữ timeout và `cache: "no-store"`; response dữ liệu nhạy cảm không được cache công khai. Giữ mã HTTP, error code và response envelope tương thích với callers.
 - `api<T>` trả phần `data`, không trả cả envelope. Response `204` dùng `api<void>` và không parse JSON; không ép endpoint trả JSON nếu contract không có body.
 - Refresh hiện được gọi tường minh, không tự thêm retry/refresh khi gặp 401. Logout lỗi giữ session để thử lại; logout thành công hủy query đang chạy, xóa cache và điều hướng như hiện tại.
+- Contract catalog tham chiếu Swagger `/swagger/openapi.json`: company cho sửa code; plan không cho sửa code/product; feature cho sửa product/code/type nhưng backend có thể từ chối khi đã được tham chiếu. Trường nullable gửi `null` để xóa, không đổi các giá trị thiếu thành null trong PATCH. Danh sách dùng offset, không có total. Quản lý liên kết plan-feature là endpoint riêng, không ghép vào payload plan.
 
 ## Kiểm tra và bàn giao
 

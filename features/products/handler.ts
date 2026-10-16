@@ -42,7 +42,10 @@ export async function handleProduct(request: Request, id?: string) {
   const offset = params.get("offset") ?? "0";
   if (!/^\d+$/.test(offset) || !Number.isSafeInteger(Number(offset)))
     return failure(400, "VALIDATION_ERROR");
-  const path = id ? `/products/${id}` : `/products?limit=20&offset=${offset}`;
+  const search = params.get("search")?.trim() ?? "";
+  const query = new URLSearchParams({ limit: "20", offset });
+  if (method === "GET" && search) query.set("search", search);
+  const path = id ? `/products/${id}` : `/products?${query}`;
   try {
     const response = await fetch(
       `${process.env.API_BASE_URL ?? "http://localhost:5000/api/v1"}${path}`,

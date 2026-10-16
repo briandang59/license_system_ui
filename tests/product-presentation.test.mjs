@@ -28,12 +28,15 @@ test("product actions preserve record IDs, confirmation and pending deletion sta
   const calls = [];
   for (const isDeleting of [false, true]) {
     const columns = getProductColumns({
+      offset: 20,
       onView: (id) => calls.push(["view", id]),
       onEdit: (id) => calls.push(["edit", id]),
       onDelete: (id) => calls.push(["delete", id]),
       isDeleting,
       deletingId: 7,
     });
+    assert.equal(columns[0].render(null, { id: 7 }, 0), 21);
+    assert.equal(columns[0].render(null, { id: 7 }, 5), 26);
     const [view, edit, confirmation] = columns.at(-1).render(null, { id: 7 }).props.children;
     view.props.onClick();
     edit.props.onClick();

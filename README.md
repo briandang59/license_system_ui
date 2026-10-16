@@ -5,6 +5,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 - `app/`: Next.js routes, API route entry, layouts và providers.
 - `features/auth/`: login, logout, schema, service, URL và server handler xác thực.
 - `features/products/`: UI CRUD, schema, service, URL và server handler products.
+- `features/companies/`, `features/plans/`, `features/features/`: CRUD tương ứng tại `/companies`, `/plans`, `/features`, gồm form, columns, descriptions, schema, service, URL và handler. Forms plan/feature dùng bộ chọn product có tải thêm theo trang.
 - `components/`: form controls và layouts dùng chung.
 - `lib/`: HTTP client, response contract và ánh xạ lỗi.
 - `utils/`: helpers độc lập nghiệp vụ dùng chung.
@@ -13,6 +14,10 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 Quy tắc đặt file, chiều phụ thuộc và kiểm tra nằm trong [AGENTS.md](AGENTS.md).
 Hướng dẫn triển khai theo repository nằm trong [skill license-system-ui](.agents/skills/license-system-ui/SKILL.md).
 Code riêng của domain nằm trong feature, kể cả schema/URL được cả client và server dùng. Handler đặt trực tiếp tại `features/<domain>/handler.ts`, ngang hàng với `schema.ts`, `service.ts`, `urls.ts`; không có thư mục `server/`. Handler chỉ chạy phía server và không được import vào client.
+
+Catalog dựa trên Swagger backend `/swagger/openapi.json`: company cho sửa code, plan giữ code/product khi update, feature hỗ trợ loại boolean/quantity/unlimited và unit. Trường tùy chọn xóa trắng trong form được gửi thành `null`. Danh sách phân trang offset, không suy ra total. Các endpoint liên kết plan-feature được tách riêng khỏi CRUD này.
+
+Bốn bảng products/companies/plans/features dùng số thứ tự theo offset, checkbox chọn dòng và tìm kiếm phía backend (Enter/nút tìm kiếm; clear để bỏ lọc). ID kỹ thuật không hiển thị ở bảng/chi tiết nhưng vẫn dùng làm khóa nội bộ. View/Edit/Delete dùng icon Lucide có nhãn truy cập; đổi trang/từ khóa hoặc xóa thành công sẽ xóa lựa chọn dòng.
 
 ## Getting Started
 
