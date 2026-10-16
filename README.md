@@ -1,5 +1,19 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Cấu trúc mã nguồn
+
+- `app/`: Next.js routes, API route entry, layouts và providers.
+- `features/auth/`: login, logout, schema, service, URL và server handler xác thực.
+- `features/products/`: UI CRUD, schema, service, URL và server handler products.
+- `components/`: form controls và layouts dùng chung.
+- `lib/`: HTTP client, response contract và ánh xạ lỗi.
+- `utils/`: helpers độc lập nghiệp vụ dùng chung.
+- `tests/`: tests chạy bằng `node:test`.
+
+Quy tắc đặt file, chiều phụ thuộc và kiểm tra nằm trong [AGENTS.md](AGENTS.md).
+Hướng dẫn triển khai theo repository nằm trong [skill license-system-ui](.agents/skills/license-system-ui/SKILL.md).
+Code riêng của domain nằm trong feature, kể cả schema/URL được cả client và server dùng; server handler luôn nằm trong `features/<domain>/server/`.
+
 ## Getting Started
 
 ### Docker
@@ -17,6 +31,8 @@ Compose mặc định gọi backend trên máy host tại `http://host.docker.in
 Có thể đặt `DOCKER_API_BASE_URL` và `UI_PORT` trong file `.env` tại repo root (xem `.env.example`). Các giá trị này được Compose truyền lúc chạy; file `.env*` thực tế không được đưa vào image. `API_BASE_URL` vẫn dành cho chạy ứng dụng trực tiếp ngoài Docker. Sau khi đổi cấu hình, chạy lại `docker compose up -d`.
 
 Image dùng Next.js standalone, chạy bằng user `node`, bao gồm `public` và `.next/static`. Khi triển khai qua domain, dùng HTTPS/reverse proxy vì cookie xác thực production có cờ `Secure`; proxy cần giữ đúng host/origin để request thay đổi dữ liệu vượt qua kiểm tra same-origin.
+
+`APP_ORIGIN` là origin công khai của UI để kiểm tra request thay đổi dữ liệu, vì request URL trong standalone có thể dùng hostname nội bộ. Compose mặc định dùng `http://localhost:3000` (theo `UI_PORT`). Nếu truy cập qua IP/domain khác, đặt `APP_ORIGIN` đúng scheme, host và port trên trình duyệt, không có dấu `/` cuối, rồi chạy `docker compose up -d`. Ví dụ: `APP_ORIGIN=https://license.example.com`. Không đặt thành URL backend.
 
 ### Authentication
 
@@ -46,7 +62,7 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Sửa màn hình trong `features/auth/login-page.tsx` hoặc `features/products/page.tsx`; các file `app/**/page.tsx` tương ứng chỉ nối route tới feature. Trang overview nằm tại `app/(dashboard)/page.tsx`.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 

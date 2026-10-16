@@ -5,7 +5,7 @@ import {
   loginSchema,
   loginResponseSchema,
   registerSchema,
-} from "../auth-schema";
+} from "@/features/auth/schema";
 
 type Action = "login" | "register" | "logout" | "refresh" | "me";
 const errorSchema = z.object({
@@ -33,7 +33,8 @@ function failure(status: number, code: string) {
 export async function handleAuth(request: Request, action: Action) {
   if (
     action !== "me" &&
-    request.headers.get("origin") !== new URL(request.url).origin
+    request.headers.get("origin") !==
+      (process.env.APP_ORIGIN || new URL(request.url).origin)
   ) {
     return failure(403, "FORBIDDEN");
   }

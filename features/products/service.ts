@@ -1,31 +1,31 @@
 import { api } from "@/lib/api";
-import { urls } from "@/utils/constants/urls";
+import { productUrls } from "@/features/products/urls";
 import type {
   Product,
   ProductInput,
   ProductUpdate,
   ProductList,
-} from "@/lib/product-schema";
+} from "@/features/products/schema";
 
 export const productService = {
   getAll: (offset = 0, signal?: AbortSignal) =>
-    api<ProductList>(`${urls.products.list}?limit=20&offset=${offset}`, {
+    api<ProductList>(`${productUrls.list}?limit=20&offset=${offset}`, {
       signal,
     }),
   getById: (id: number, signal?: AbortSignal) =>
-    api<Product>(urls.products.detail(id), { signal }),
+    api<Product>(productUrls.detail(id), { signal }),
   create: (data: ProductInput) =>
-    api<Product>(urls.products.list, {
+    api<Product>(productUrls.list, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     }),
   update: (id: number, data: ProductUpdate) =>
-    api<Product>(urls.products.detail(id), {
+    api<Product>(productUrls.detail(id), {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     }),
   remove: (id: number) =>
-    api<void>(urls.products.detail(id), { method: "DELETE" }),
+    api<void>(productUrls.detail(id), { method: "DELETE" }),
 };

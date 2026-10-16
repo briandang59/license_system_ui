@@ -20,26 +20,63 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 | Vị trí | Trách nhiệm |
 | --- | --- |
-| `app/(dashboard)/` | Trang quản trị; dùng layout quản trị hiện có |
-| `app/auth/` | Trang xác thực; dùng layout xác thực hiện có |
+| `app/(dashboard)/` | Route/layout quản trị; trang products nối tới feature, overview đơn giản ở lại đây |
+| `app/auth/` | Route/layout xác thực; trang login nối tới `features/auth/login-page.tsx` |
 | `app/api/**/route.ts` | Khai báo HTTP methods, đọc route params và gọi server handler |
-| `lib/server/*-handler.ts` | Kiểm tra request, cookie, gọi backend, kiểm tra response và trả HTTP response |
-| `services/*.service.ts` | Hàm gọi API same-origin qua `api<T>`; không chứa UI hoặc cookie/token logic |
-| `lib/*-schema.ts` | Zod schemas và types suy ra bằng `z.infer` |
+| `features/<domain>/*page.tsx`, `form.tsx` | Màn hình và form riêng của domain |
+| `features/<domain>/schema.ts` | Zod schemas và types suy ra bằng `z.infer`, dùng cả client và server trong domain |
+| `features/<domain>/service.ts` | Gọi API same-origin qua `api<T>`; không chứa UI, cookie/token logic |
+| `features/<domain>/urls.ts` | Đường dẫn API same-origin của domain |
+| `features/<domain>/use-*.ts` | Hook nghiệp vụ khi cần, ví dụ auth logout |
+| `features/<domain>/server/handler.ts` | Kiểm tra request/cookie, gọi backend, kiểm tra response và trả HTTP response |
 | `lib/api.ts`, `lib/api-errors.ts`, `lib/baseResponse.ts` | HTTP client, lỗi và response contract dùng chung |
 | `components/form/`, `components/layouts/` | Form controls và layouts tái sử dụng |
 | `components/ui/` | UI dùng chung khi thực sự có nhu cầu tái sử dụng |
-| `utils/constants/urls.ts` | Đường dẫn API cho services |
-| `utils/hooks/`, `utils/functions/` | Hook/helper dùng chung khi cần; các file `test.ts` không phải mẫu nghiệp vụ |
+| `utils/functions/`, `utils/hooks/`, `utils/constants/` | Hàm thuần/hook/hằng số độc lập nghiệp vụ dùng chung; chỉ tạo thư mục khi có file thực tế |
 | `tests/*.test.mjs` | Tests với `node:test` và `node:assert/strict` |
+| `public/` | Tài nguyên tĩnh |
+| `.agents/skills/` | Hướng dẫn thao tác theo repository |
+| `proxy.ts` | Redirect theo sự hiện diện cookie |
+| File cấu hình ở root | Next.js, TypeScript, ESLint, pnpm và Docker |
 
-Luồng gọi API từ trình duyệt: **page/component → service → `api<T>` → `/api/*` route → server handler → backend**. Không gọi backend trực tiếp từ client, không import `lib/server/*` vào client. Không bắt Server Component gọi vòng qua API nội bộ nếu không cần.
+### Cấu trúc feature hiện tại
+
+```text
+features/
+  auth/
+    login-page.tsx
+    use-logout.ts
+    schema.ts
+    service.ts
+    urls.ts
+    server/handler.ts
+  products/
+    page.tsx
+    form.tsx
+    schema.ts
+    service.ts
+    urls.ts
+    server/handler.ts
+```
+
+### Quy tắc đặt file và chiều phụ thuộc
+
+- Mọi domain dùng `features/<domain>/`, bao gồm auth. Không đặt lại service domain ở `services/`, schema domain ở `lib/` hoặc URL domain trong `utils/`.
+- `app/` giữ route entry, layout, providers, metadata, loading/error boundaries và styles toàn cục. Trang có nghiệp vụ gọi/re-export màn hình từ feature; trang tĩnh đơn giản có thể ở lại `app/`. Providers giữ tại `app/providers.tsx`.
+- Giữ file phẳng khi feature còn nhỏ; code chỉ chạy server đặt trong `server/`. Chỉ thêm thư mục con khi thực tế cần, không dựng sẵn thư mục rỗng, barrel export hoặc factory.
+- `components/`, `lib/`, `utils/` chứa phần dùng chung có trách nhiệm rõ ràng. Schema dùng cả client và server của cùng domain vẫn thuộc feature. Không tách type chỉ để lặp lại schema.
+- Feature được import phần dùng chung; hạ tầng `lib/` và helper `utils/` không import ngược feature. Layout là điểm tích hợp được phép dùng hook/component auth; logic session thuộc `features/auth/`.
+- Không import chéo nội bộ giữa các feature hoặc tạo phụ thuộc vòng. Nếu cần chia sẻ thật, xác định phần dùng chung hoặc điểm tích hợp trước.
+- Luồng trình duyệt: **feature UI/hook → feature service → `lib/api.ts` → `app/api/*` route → feature server handler → backend**.
+- Route API khai báo HTTP methods, đọc/kiểm tra route params hoặc action rồi gọi handler. Handler kiểm tra request/response, cookie và gọi backend; không đưa logic backend vào page.
+- Không gọi backend trực tiếp từ client hoặc import `features/*/server/*` vào client. Import trực tiếp đúng module; không gom module client và server vào một barrel. Server Component có thể gọi code server trực tiếp, không bắt gọi vòng qua API nội bộ.
+- Khi di chuyển file, cập nhật imports, test mocks, tài liệu và skill; bỏ đường dẫn cũ khi không có caller cần giữ. Không dùng file `test.ts` rỗng làm placeholder; test thực thi nằm trong `tests/`.
 
 ## Quy ước triển khai
 
 - Dùng TypeScript strict, alias `@/` cho import nội bộ như code xung quanh; không dùng `any` để né lỗi type. Dữ liệu bên ngoài chưa xác thực có type `unknown`.
 - Giữ Server Component mặc định; chỉ thêm `"use client"` ở nơi cần hooks, event handlers hoặc browser APIs. Giữ providers tại `app/providers.tsx` và registry/layout hiện có.
-- Dùng Ant Design cho controls, React Hook Form + `zodResolver` cho form, `FormInput` cho input chuỗi. Dùng `Controller` cho control khác; không tạo thêm một form state độc lập bằng Ant Design Form.
+- Dùng Ant Design cho controls, React Hook Form + `zodResolver` cho form. Tái sử dụng các `Form*` trong `components/form/` (xem `components/form/README.md`) trước khi viết `Controller` riêng; không tạo thêm một form state độc lập bằng Ant Design Form.
 - Dùng TanStack Query cho server state; query key chứa tham số ảnh hưởng kết quả, truyền `signal` qua service cho query và invalidate cache liên quan sau mutation thành công. State mở modal, phân trang dùng state cục bộ như trang products.
 - Có trạng thái loading, empty, error/retry phù hợp; chặn gửi lặp khi pending, xác nhận trước thao tác xóa. Giữ label, thông báo lỗi truy cập được và điều hướng bàn phím.
 - Lỗi API hiển thị qua `getApiErrorMessage`; không hiển thị nguyên lỗi backend hoặc thông tin nhạy cảm.

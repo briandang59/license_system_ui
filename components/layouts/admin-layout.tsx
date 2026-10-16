@@ -2,10 +2,9 @@
 
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Alert, Avatar, Button, Drawer, Menu } from "antd";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { authService } from "@/services/auth.service";
+import { useLogout } from "@/features/auth/use-logout";
 import { getApiErrorMessage } from "@/lib/api-errors";
 
 const items = [
@@ -23,18 +22,7 @@ const items = [
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const queryClient = useQueryClient();
-  const logout = useMutation({
-    mutationFn: authService.logout,
-    retry: false,
-    onSuccess: async () => {
-      await queryClient.cancelQueries();
-      queryClient.clear();
-      router.replace("/auth/login");
-      router.refresh();
-    },
-  });
+  const logout = useLogout();
   const [menuOpen, setMenuOpen] = useState(false);
   const navigation = (
     <nav aria-label="Main navigation">

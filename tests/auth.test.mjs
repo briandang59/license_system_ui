@@ -17,9 +17,9 @@ function load(path, imports = {}) {
   return compiled.exports;
 }
 
-const schemas = load("lib/auth-schema.ts");
-const { handleAuth } = load("lib/server/auth-handler.ts", { "../auth-schema": schemas });
-const { POST } = load("app/api/auth/login/route.ts", { "@/lib/server/auth-handler": { handleAuth } });
+const schemas = load("features/auth/schema.ts");
+const { handleAuth } = load("features/auth/server/handler.ts", { "@/features/auth/schema": schemas });
+const { POST } = load("app/api/auth/login/route.ts", { "@/features/auth/server/handler": { handleAuth } });
 const { proxy, config } = load("proxy.ts");
 const { NextRequest } = loadDependency("next/server");
 const { unstable_doesMiddlewareMatch } = loadDependency("next/experimental/testing/server");
@@ -60,11 +60,34 @@ function request(body, origin = "http://localhost:3000") {
 }
 const credentials = { email: "test@example.com", password: "test-only" };
 
+test("configured public origin accepts Docker requests and rejects foreign or missing origins", async () => {
+  const previous = process.env.APP_ORIGIN;
+  process.env.APP_ORIGIN = "https://license.example.com";
+  global.fetch = () => { throw new Error("Backend must not be called for invalid input"); };
+  try {
+    const productSchemas = load("features/products/schema.ts");
+    const { handleProduct } = load("features/products/server/handler.ts", { "@/features/products/schema": productSchemas });
+    for (const origin of [process.env.APP_ORIGIN, "https://other.example", null]) {
+      const headers = { "Content-Type": "application/json", cookie: "access_token=test" };
+      if (origin) headers.origin = origin;
+      const makeRequest = () => new Request("http://0.0.0.0:3000/api/test", {
+        method: "POST", headers, body: "{}",
+      });
+      const expected = origin === process.env.APP_ORIGIN ? 400 : 403;
+      assert.equal((await handleAuth(makeRequest(), "login")).status, expected);
+      assert.equal((await handleProduct(makeRequest())).status, expected);
+    }
+  } finally {
+    if (previous === undefined) delete process.env.APP_ORIGIN;
+    else process.env.APP_ORIGIN = previous;
+  }
+});
+
 test("auth services use centralized paths, methods and request bodies", async () => {
-  const { urls } = load("utils/constants/urls.ts");
+  const { authUrls } = load("features/auth/urls.ts");
   const calls = [];
-  const { authService } = load("services/auth.service.ts", {
-    "@/utils/constants/urls": { urls },
+  const { authService } = load("features/auth/service.ts", {
+    "@/features/auth/urls": { authUrls },
     "@/lib/api": { api: async (path, options) => { calls.push({ path, options }); } },
   });
   await authService.login(credentials);
@@ -81,11 +104,42 @@ test("auth services use centralized paths, methods and request bodies", async ()
   assert.equal(calls[4].options.signal, signal);
 });
 
+test("logout waits for query cancellation before clearing cache and navigating", async () => {
+  const calls = [];
+  let completeCancellation;
+  const cancellation = new Promise((resolve) => { completeCancellation = resolve; });
+  const logout = () => {};
+  const { useLogout } = load("features/auth/use-logout.ts", {
+    "next/navigation": { useRouter: () => ({
+      replace: (path) => calls.push(path),
+      refresh: () => calls.push("refresh"),
+    }) },
+    "@tanstack/react-query": {
+      useMutation: (options) => options,
+      useQueryClient: () => ({
+        cancelQueries: () => { calls.push("cancel"); return cancellation; },
+        clear: () => calls.push("clear"),
+      }),
+    },
+    "@/features/auth/service": { authService: { logout } },
+  });
+  const mutation = useLogout();
+  assert.equal(mutation.mutationFn, logout);
+  assert.equal(mutation.retry, false);
+  const completion = mutation.onSuccess();
+  assert.deepEqual(calls, ["cancel"]);
+  completeCancellation();
+  await completion;
+  assert.deepEqual(calls, ["cancel", "clear", "/auth/login", "refresh"]);
+});
+
 test("shared Ant Design input renders password fields and marks invalid fields", () => {
   const { createElement } = loadDependency("react");
   const { renderToStaticMarkup } = loadDependency("react-dom/server");
   const { useForm } = loadDependency("react-hook-form");
-  const FormInput = load("components/form/form-input.tsx").default;
+  const FormInput = load("components/form/form-input.tsx", {
+    "./form-field": load("components/form/form-field.tsx"),
+  }).default;
   function Example() {
     const { control } = useForm({
       defaultValues: { password: "" },

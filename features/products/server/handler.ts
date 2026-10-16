@@ -5,7 +5,7 @@ import {
   productUpdateSchema,
   productSchema,
   productListSchema,
-} from "../product-schema";
+} from "@/features/products/schema";
 
 function failure(status: number, code: string) {
   return NextResponse.json(
@@ -18,7 +18,8 @@ export async function handleProduct(request: Request, id?: string) {
   const method = request.method;
   if (
     method !== "GET" &&
-    request.headers.get("origin") !== new URL(request.url).origin
+    request.headers.get("origin") !==
+      (process.env.APP_ORIGIN || new URL(request.url).origin)
   )
     return failure(403, "FORBIDDEN");
   const token = new NextRequest(request.url, {

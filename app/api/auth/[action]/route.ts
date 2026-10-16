@@ -1,4 +1,4 @@
-import { handleAuth } from "@/lib/server/auth-handler";
+import { handleAuth } from "@/features/auth/server/handler";
 
 export async function POST(
   request: Request,

@@ -1,22 +1,10 @@
 "use client";
 
-import { useId } from "react";
-import { Form, Input, type InputProps } from "antd";
-import {
-  useController,
-  type Control,
-  type FieldPathByValue,
-  type FieldValues,
-} from "react-hook-form";
+import { Input, type InputProps } from "antd";
+import type { FieldValues } from "react-hook-form";
+import FormField, { type FormControlProps, type ControlProps } from "./form-field";
 
-type FormInputProps<T extends FieldValues> = {
-  control: Control<T>;
-  name: FieldPathByValue<T, string>;
-  label: string;
-} & Omit<
-  InputProps,
-  "name" | "value" | "defaultValue" | "onChange" | "onBlur" | "id" | "status"
->;
+type FormInputProps<T extends FieldValues> = FormControlProps<T, string> & ControlProps<InputProps>;
 
 export default function FormInput<T extends FieldValues>({
   control,
@@ -26,35 +14,11 @@ export default function FormInput<T extends FieldValues>({
   disabled,
   ...props
 }: FormInputProps<T>) {
-  const id = useId();
-  const {
-    field,
-    fieldState: { error },
-  } = useController({ control, name, disabled });
   const Component = type === "password" ? Input.Password : Input;
 
   return (
-    <Form.Item
-      label={label}
-      htmlFor={id}
-      layout="vertical"
-      validateStatus={error ? "error" : undefined}
-      help={
-        error ? (
-          <span id={`${id}-error`} role="alert">
-            {error.message}
-          </span>
-        ) : undefined
-      }
-    >
-      <Component
-        {...props}
-        {...field}
-        id={id}
-        type={type}
-        aria-invalid={!!error}
-        aria-describedby={error ? `${id}-error` : undefined}
-      />
-    </Form.Item>
+    <FormField<T, string> control={control} name={name} label={label} disabled={disabled}>
+      {(field, a11y) => <Component {...props} {...field} {...a11y} type={type} />}
+    </FormField>
   );
 }

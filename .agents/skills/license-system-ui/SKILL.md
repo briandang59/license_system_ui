@@ -15,15 +15,15 @@ Skill nằm tại `.agents/skills/license-system-ui/` trong repository. Xác đ�
 
 ## Chọn file theo công việc
 
-- **CRUD hoặc dữ liệu domain:** đọc `lib/product-schema.ts`, `services/product.service.ts`, `utils/constants/urls.ts`, `app/api/products/route.ts`, `app/api/products/[id]/route.ts`, `lib/server/product-handler.ts` và `app/(dashboard)/products/page.tsx` khi cần từng tầng.
-- **Form:** đọc `components/form/form-input.tsx` và form tại `app/auth/login/page.tsx`; schema dùng chung nằm trong `lib/`, types suy ra từ schema. Giữ validation phía server dù client đã validate.
-- **Xác thực:** đọc `lib/server/auth-handler.ts`, `services/auth.service.ts`, `lib/auth-schema.ts`, `proxy.ts`, `components/layouts/admin-layout.tsx` và `tests/auth.test.mjs`; giữ các ràng buộc bảo mật và hành vi session trong `AGENTS.md`.
+- **CRUD hoặc dữ liệu domain:** đọc `features/products/schema.ts`, `features/products/service.ts`, `features/products/urls.ts`, `app/api/products/route.ts`, `app/api/products/[id]/route.ts`, `features/products/server/handler.ts` và `features/products/page.tsx` khi cần từng tầng. `app/(dashboard)/products/page.tsx` chỉ nối route tới feature.
+- **Form:** đọc `components/form/README.md`, control liên quan và `features/products/form.tsx` hoặc `features/auth/login-page.tsx`. Tái sử dụng `Form*` với `control`, `name`, `label`; `FormField` dùng chung phần label/lỗi/accessibility. Schema domain nằm trong `features/<domain>/schema.ts`, types suy ra từ schema. Giữ validation phía server dù client đã validate.
+- **Xác thực:** đọc `features/auth/server/handler.ts`, `features/auth/service.ts`, `features/auth/schema.ts`, `features/auth/urls.ts`, `features/auth/use-logout.ts`, `proxy.ts`, `components/layouts/admin-layout.tsx` và `tests/auth.test.mjs`; giữ các ràng buộc bảo mật và hành vi session trong `AGENTS.md`.
 - **Bố cục/provider:** đọc `app/layout.tsx`, `app/providers.tsx`, layout của route group và `components/layouts/` liên quan; không bọc thêm QueryClientProvider hoặc layout trùng lặp.
 
 ## Thực hiện thay đổi đủ luồng
 
 - Xác minh contract backend trước khi thêm endpoint/field: method, URL, payload, response, lỗi, phân trang. Nếu thiếu contract, tìm trong code/tài liệu sẵn có; hỏi phần thiếu quyết định hành vi thay vì tự bịa API.
-- Với API mới, đặt schema và type ở `lib/<domain>-schema.ts`, URL tại `utils/constants/urls.ts`, hàm gọi ở `services/<domain>.service.ts`. Route HTTP mỏng gọi handler tương ứng ở `lib/server/`; không đưa logic backend vào page.
+- Mọi domain dùng `features/<domain>/`: UI, schema/type, URL, service, hook và `server/handler.ts`. Đọc mục cấu trúc trong `AGENTS.md` trước khi đặt file; dùng auth/products làm mẫu. Phần dùng chung giữ tại `lib/`, `utils/`, `components/`; `app/` giữ route/layout/providers. Không thêm lại `services/` ở root, schema domain trong `lib/` hoặc URL domain trong `utils/`. Route HTTP mỏng gọi feature server handler; không đưa logic backend vào page.
 - Với dynamic route, đọc tài liệu `01-app/03-api-reference/03-file-conventions/route.md`; mẫu hiện tại dùng `params: Promise<...>` và `await params`. Không đổi về params đồng bộ theo hướng dẫn cũ.
 - Client query gọi service, truyền AbortSignal, dùng query key đủ tham số. Mutation thành công invalidate nhóm dữ liệu liên quan; lỗi giữ form và dữ liệu để thử lại.
 - Giữ đúng khác biệt create/update thay vì gửi nguyên object từ form. Ví dụ hiện tại product `code` chỉ được đặt khi create, update gửi `ProductUpdate`; danh sách dùng offset với page size 20 và không có total. Không tự thêm/suy ra total hoặc cho sửa code nếu backend chưa hỗ trợ.

@@ -1,4 +1,4 @@
-import { handleProduct } from "@/lib/server/product-handler";
+import { handleProduct } from "@/features/products/server/handler";
 
 type Context = { params: Promise<{ id: string }> };
 export async function GET(request: Request, { params }: Context) {

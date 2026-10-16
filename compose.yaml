@@ -5,6 +5,7 @@ services:
     ports:
       - "${UI_PORT:-3000}:3000"
     environment:
+      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:${UI_PORT:-3000}}
       API_BASE_URL: ${DOCKER_API_BASE_URL:-http://host.docker.internal:5000/api/v1}
     extra_hosts:
       - "host.docker.internal:host-gateway"
