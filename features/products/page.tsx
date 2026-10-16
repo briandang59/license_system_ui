@@ -3,6 +3,7 @@
 import { useState, type Key } from "react";
 import {
   Alert,
+  App,
   Button,
   Descriptions,
   Input,
@@ -22,6 +23,7 @@ import { getProductColumns } from "@/features/products/columns";
 import { getProductDescriptionItems } from "@/features/products/descriptions";
 
 export default function ProductsPage() {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const [offset, setOffset] = useState(0);
   const [search, setSearch] = useState("");
@@ -42,7 +44,9 @@ export default function ProductsPage() {
   });
   const remove = useMutation({
     mutationFn: productService.remove,
+    onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: async () => {
+      void message.success("Product deleted.");
       setSelectedRowKeys([]);
       if (products.data?.items.length === 1 && offset > 0)
         setOffset(offset - 20);
@@ -63,16 +67,15 @@ export default function ProductsPage() {
           Add product
         </Button>
       </div>
-      {(products.isError || remove.isError) && (
+      {products.isError && (
         <div role="alert" className="mb-5">
           <Alert
             type="error"
-            title={getApiErrorMessage(remove.error ?? products.error)}
+            title={getApiErrorMessage(products.error)}
             action={
               <Button
                 icon={<RotateCw size={16} aria-hidden="true" />}
                 onClick={() => {
-                  remove.reset();
                   void products.refetch();
                 }}
               >

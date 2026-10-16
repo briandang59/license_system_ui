@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Alert, Button } from "antd";
+import { App, Button } from "antd";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -11,6 +11,7 @@ import { getApiErrorMessage } from "@/lib/api-errors";
 import { authService } from "@/features/auth/service";
 
 export default function LoginPage() {
+  const { message } = App.useApp();
   const router = useRouter();
   const queryClient = useQueryClient();
   const { control, handleSubmit, resetField } = useForm<LoginInput>({
@@ -21,7 +22,9 @@ export default function LoginPage() {
     mutationFn: authService.login,
     retry: false,
     gcTime: 0,
+    onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: () => {
+      void message.success("Signed in.");
       queryClient.clear();
       resetField("password");
       router.replace("/");
@@ -62,15 +65,6 @@ export default function LoginPage() {
               placeholder="Enter your password"
               size="large"
             />
-            {login.isError && (
-              <div role="alert" className="mb-5">
-                <Alert
-                  title={getApiErrorMessage(login.error)}
-                  type="error"
-                  showIcon
-                />
-              </div>
-            )}
             <Button
               type="primary"
               htmlType="submit"

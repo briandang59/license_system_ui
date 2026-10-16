@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert, Button } from "antd";
+import { App, Button } from "antd";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -13,6 +13,7 @@ import { featureFormSchema, type Feature, type FeatureForm as FeatureFormValues 
 import { featureService } from "@/features/features/service";
 
 export function FeatureForm({ feature, onSaved }: { feature?: Feature; onSaved: () => void }) {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const { control, handleSubmit } = useForm<FeatureFormValues>({
     resolver: zodResolver(featureFormSchema),
@@ -35,7 +36,9 @@ export function FeatureForm({ feature, onSaved }: { feature?: Feature; onSaved: 
       };
       return feature ? featureService.update(feature.id, payload) : featureService.create(payload);
     },
+    onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: async () => {
+      void message.success(feature ? "Feature updated." : "Feature created.");
       await queryClient.invalidateQueries({ queryKey: ["features"] });
       onSaved();
     },
@@ -51,7 +54,6 @@ export function FeatureForm({ feature, onSaved }: { feature?: Feature; onSaved: 
         options={[{ value: "boolean", label: "Boolean" }, { value: "quantity", label: "Quantity" }, { value: "unlimited", label: "Unlimited" }]} />
       <FormSelect control={control} name="status" label="Status" disabled={save.isPending}
         options={[{ value: "active", label: "Active" }, { value: "inactive", label: "Inactive" }]} />
-      {save.isError && <div role="alert" className="mb-4"><Alert type="error" title={getApiErrorMessage(save.error)} /></div>}
       <Button htmlType="submit" type="primary" loading={save.isPending} block>
         {feature ? "Save changes" : "Create feature"}
       </Button>

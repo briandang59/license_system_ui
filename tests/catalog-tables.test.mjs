@@ -109,7 +109,10 @@ for (const [name, plural] of [["product", "products"], ["company", "companies"],
         if (state[index] === undefined) state[index] = initial;
         return [state[index], (value) => { state[index] = value; }];
       } },
-      antd: controls,
+      antd: { ...controls, App: { useApp: () => ({ message: {
+        success: (message) => calls.push(["success", message]),
+        error: (message) => calls.push(["error", message]),
+      } }) } },
       "@tanstack/react-query": {
         useQueryClient: () => ({ invalidateQueries: async (key) => calls.push(["invalidate", key]) }),
         useQuery: (options) => {
@@ -153,7 +156,10 @@ for (const [name, plural] of [["product", "products"], ["company", "companies"],
     tree = render();
     await mutation.onSuccess();
     assert.deepEqual(state[2], []);
+    assert.ok(calls.some((call) => call[0] === "success" && call[1] === `${cap} deleted.`));
     assert.deepEqual(calls.at(-1), ["invalidate", { queryKey: [plural] }]);
+    mutation.onError(new Error("secret"));
+    assert.deepEqual(calls.at(-1), ["error", "Request failed"]);
     find(tree, "search")[0].props.onSearch("");
     tree = render();
     assert.deepEqual(queries[0].queryKey, [plural, "list", 0, ""]);

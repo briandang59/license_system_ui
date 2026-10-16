@@ -158,7 +158,10 @@ for (const [name, plural] of domains) {
     let mutation;
     let pending = false;
     const imports = {
-      antd: { Alert: "alert", Button: "button" },
+      antd: { App: { useApp: () => ({ message: {
+        success: (message) => calls.push(["success", message]),
+        error: (message) => calls.push(["error", message]),
+      } }) }, Button: "button" },
       "react-hook-form": { useForm: () => ({ control: {}, handleSubmit: (callback) => () => callback(formData) }) },
       "@hookform/resolvers/zod": { zodResolver: () => {} },
       "@tanstack/react-query": {
@@ -194,7 +197,10 @@ for (const [name, plural] of domains) {
     }
     await mutation.onSuccess();
     assert.equal(saved, 1);
+    assert.ok(calls.some((call) => call[0] === "success" && call[1] === `${cap} updated.`));
     assert.deepEqual(calls.at(-1), ["invalidate", { queryKey: [plural] }]);
+    mutation.onError(new Error("secret backend detail"));
+    assert.deepEqual(calls.at(-1), ["error", "Request failed"]);
     pending = true;
     const blocked = Form({ onSaved: () => saved++ });
     const count = calls.length;

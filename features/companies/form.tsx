@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert, Button } from "antd";
+import { App, Button } from "antd";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -11,6 +11,7 @@ import { companyFormSchema, type Company, type CompanyForm as CompanyFormValues 
 import { companyService } from "@/features/companies/service";
 
 export function CompanyForm({ company, onSaved }: { company?: Company; onSaved: () => void }) {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const { control, handleSubmit } = useForm<CompanyFormValues>({
     resolver: zodResolver(companyFormSchema),
@@ -33,7 +34,9 @@ export function CompanyForm({ company, onSaved }: { company?: Company; onSaved: 
       };
       return company ? companyService.update(company.id, payload) : companyService.create(payload);
     },
+    onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: async () => {
+      void message.success(company ? "Company updated." : "Company created.");
       await queryClient.invalidateQueries({ queryKey: ["companies"] });
       onSaved();
     },
@@ -47,7 +50,6 @@ export function CompanyForm({ company, onSaved }: { company?: Company; onSaved: 
       <FormInput control={control} name="phone" label="Phone" disabled={save.isPending} />
       <FormSelect control={control} name="status" label="Status" disabled={save.isPending}
         options={[{ value: "active", label: "Active" }, { value: "inactive", label: "Inactive" }]} />
-      {save.isError && <div role="alert" className="mb-4"><Alert type="error" title={getApiErrorMessage(save.error)} /></div>}
       <Button htmlType="submit" type="primary" loading={save.isPending} block>
         {company ? "Save changes" : "Create company"}
       </Button>

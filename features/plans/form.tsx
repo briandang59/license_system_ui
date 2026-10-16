@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert, Button } from "antd";
+import { App, Button } from "antd";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -13,6 +13,7 @@ import { planFormSchema, type Plan, type PlanForm as PlanFormValues } from "@/fe
 import { planService } from "@/features/plans/service";
 
 export function PlanForm({ plan, onSaved }: { plan?: Plan; onSaved: () => void }) {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const { control, handleSubmit } = useForm<PlanFormValues>({
     resolver: zodResolver(planFormSchema),
@@ -34,7 +35,9 @@ export function PlanForm({ plan, onSaved }: { plan?: Plan; onSaved: () => void }
         ? planService.update(plan.id, { name: payload.name, description: payload.description, status: payload.status })
         : planService.create(payload);
     },
+    onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: async () => {
+      void message.success(plan ? "Plan updated." : "Plan created.");
       await queryClient.invalidateQueries({ queryKey: ["plans"] });
       onSaved();
     },
@@ -47,7 +50,6 @@ export function PlanForm({ plan, onSaved }: { plan?: Plan; onSaved: () => void }
       <FormTextarea control={control} name="description" label="Description" disabled={save.isPending} rows={3} />
       <FormSelect control={control} name="status" label="Status" disabled={save.isPending}
         options={[{ value: "active", label: "Active" }, { value: "inactive", label: "Inactive" }]} />
-      {save.isError && <div role="alert" className="mb-4"><Alert type="error" title={getApiErrorMessage(save.error)} /></div>}
       <Button htmlType="submit" type="primary" loading={save.isPending} block>
         {plan ? "Save changes" : "Create plan"}
       </Button>

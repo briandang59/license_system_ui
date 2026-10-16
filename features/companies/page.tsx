@@ -3,6 +3,7 @@
 import { useState, type Key } from "react";
 import {
   Alert,
+  App,
   Button,
   Descriptions,
   Input,
@@ -22,6 +23,7 @@ import { getCompanyColumns } from "@/features/companies/columns";
 import { getCompanyDescriptionItems } from "@/features/companies/descriptions";
 
 export default function CompaniesPage() {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const [offset, setOffset] = useState(0);
   const [search, setSearch] = useState("");
@@ -42,7 +44,9 @@ export default function CompaniesPage() {
   });
   const remove = useMutation({
     mutationFn: companyService.remove,
+    onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: async () => {
+      void message.success("Company deleted.");
       setSelectedRowKeys([]);
       if (companies.data?.items.length === 1 && offset > 0)
         setOffset(offset - 20);
@@ -63,16 +67,15 @@ export default function CompaniesPage() {
           Add company
         </Button>
       </div>
-      {(companies.isError || remove.isError) && (
+      {companies.isError && (
         <div role="alert" className="mb-5">
           <Alert
             type="error"
-            title={getApiErrorMessage(remove.error ?? companies.error)}
+            title={getApiErrorMessage(companies.error)}
             action={
               <Button
                 icon={<RotateCw size={16} aria-hidden="true" />}
                 onClick={() => {
-                  remove.reset();
                   void companies.refetch();
                 }}
               >

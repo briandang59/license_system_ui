@@ -3,6 +3,7 @@
 import { useState, type Key } from "react";
 import {
   Alert,
+  App,
   Button,
   Descriptions,
   Input,
@@ -23,6 +24,7 @@ import { getPlanDescriptionItems } from "@/features/plans/descriptions";
 import PlanFeaturesModal from "@/features/plans/plan-features-modal";
 
 export default function PlansPage() {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const [offset, setOffset] = useState(0);
   const [search, setSearch] = useState("");
@@ -44,7 +46,9 @@ export default function PlansPage() {
   });
   const remove = useMutation({
     mutationFn: planService.remove,
+    onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: async () => {
+      void message.success("Plan deleted.");
       setSelectedRowKeys([]);
       if (plans.data?.items.length === 1 && offset > 0)
         setOffset(offset - 20);
@@ -65,16 +69,15 @@ export default function PlansPage() {
           Add plan
         </Button>
       </div>
-      {(plans.isError || remove.isError) && (
+      {plans.isError && (
         <div role="alert" className="mb-5">
           <Alert
             type="error"
-            title={getApiErrorMessage(remove.error ?? plans.error)}
+            title={getApiErrorMessage(plans.error)}
             action={
               <Button
                 icon={<RotateCw size={16} aria-hidden="true" />}
                 onClick={() => {
-                  remove.reset();
                   void plans.refetch();
                 }}
               >

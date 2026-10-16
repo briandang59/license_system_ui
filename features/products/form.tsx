@@ -12,7 +12,7 @@ import {
 import { productService } from "@/features/products/service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Alert, Button } from "antd";
+import { App, Button } from "antd";
 import { useForm } from "react-hook-form";
 
 export const ProductForm = ({
@@ -22,6 +22,7 @@ export const ProductForm = ({
   product?: Product;
   onSaved: () => void;
 }) => {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const { control, handleSubmit } = useForm<ProductInput>({
     resolver: zodResolver(productInputSchema),
@@ -43,7 +44,9 @@ export const ProductForm = ({
             status: data.status,
           })
         : productService.create(data),
+    onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: async () => {
+      void message.success(product ? "Product updated." : "Product created.");
       await queryClient.invalidateQueries({ queryKey: ["products"] });
       onSaved();
     },
@@ -84,11 +87,6 @@ export const ProductForm = ({
           { value: "inactive", label: "Inactive" },
         ]}
       />
-      {save.isError && (
-        <div role="alert" className="mb-4">
-          <Alert type="error" title={getApiErrorMessage(save.error)} />
-        </div>
-      )}
       <Button htmlType="submit" type="primary" loading={save.isPending} block>
         {product ? "Save changes" : "Create product"}
       </Button>

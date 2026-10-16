@@ -93,6 +93,7 @@ features/
 - Dùng TanStack Query cho server state; query key chứa tham số ảnh hưởng kết quả, truyền `signal` qua service cho query và invalidate cache liên quan sau mutation thành công. State mở modal, phân trang dùng state cục bộ như trang products.
 - Có trạng thái loading, empty, error/retry phù hợp; chặn gửi lặp khi pending, xác nhận trước thao tác xóa. Giữ label, thông báo lỗi truy cập được và điều hướng bàn phím.
 - Lỗi API hiển thị qua `getApiErrorMessage`; không hiển thị nguyên lỗi backend hoặc thông tin nhạy cảm.
+- Phản hồi thao tác tạo/sửa/xóa và xác thực dùng `App.useApp().message` của Ant Design; `App` nằm trong `ConfigProvider` tại `app/providers.tsx` để nhận theme. Không gọi static `message.*` hoặc tự thêm thư viện toast. Báo một lần cho mỗi thao tác; thao tác nhiều mục báo kết quả tổng hợp theo số thành công/thất bại. Validation vẫn hiển thị tại field; lỗi tải dữ liệu dùng Alert và Retry tại vùng dữ liệu. Không hiện đồng thời toast và Alert giống nhau cho cùng một lỗi thao tác.
 - Chỉ tách component/helper khi có trách nhiệm rõ hoặc tái sử dụng thực tế; không tạo sẵn hook/service/repository factory cho tính năng chưa tồn tại.
 
 ## Thiết kế giao diện và dark mode

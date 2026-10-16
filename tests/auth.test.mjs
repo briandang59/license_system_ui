@@ -110,6 +110,11 @@ test("logout waits for query cancellation before clearing cache and navigating",
   const cancellation = new Promise((resolve) => { completeCancellation = resolve; });
   const logout = () => {};
   const { useLogout } = load("features/auth/use-logout.ts", {
+    antd: { App: { useApp: () => ({ message: {
+      success: (message) => calls.push(message),
+      error: (message) => calls.push(message),
+    } }) } },
+    "@/lib/api-errors": { getApiErrorMessage: () => "Safe logout error" },
     "next/navigation": { useRouter: () => ({
       replace: (path) => calls.push(path),
       refresh: () => calls.push("refresh"),
@@ -130,7 +135,9 @@ test("logout waits for query cancellation before clearing cache and navigating",
   assert.deepEqual(calls, ["cancel"]);
   completeCancellation();
   await completion;
-  assert.deepEqual(calls, ["cancel", "clear", "/auth/login", "refresh"]);
+  assert.deepEqual(calls, ["cancel", "clear", "Signed out.", "/auth/login", "refresh"]);
+  mutation.onError(new Error("secret"));
+  assert.equal(calls.at(-1), "Safe logout error");
 });
 
 test("shared Ant Design input renders password fields and marks invalid fields", () => {

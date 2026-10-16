@@ -3,11 +3,10 @@
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Alert, Avatar, Button, Drawer, Menu } from "antd";
+import { Avatar, Button, Drawer, Menu } from "antd";
 import { Building2, ChevronRight, Layers3, LayoutDashboard, LogOut, Menu as MenuIcon, Package, Puzzle, ShieldCheck } from "lucide-react";
 import ThemeSwitcher from "@/components/ui/theme-switcher";
 import { useLogout } from "@/features/auth/use-logout";
-import { getApiErrorMessage } from "@/lib/api-errors";
 
 const items = [
   { key: "/", icon: <LayoutDashboard size={17} aria-hidden="true" />, label: <Link href="/">Overview</Link> },
@@ -103,15 +102,6 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </div>
         </header>
         <main id="main-content" className="mx-auto max-w-[1600px] p-4 sm:p-8">
-          {logout.isError && (
-            <div role="alert" className="mb-5">
-              <Alert
-                type="error"
-                showIcon
-                title={getApiErrorMessage(logout.error)}
-              />
-            </div>
-          )}
           <div className="rounded-xl border border-line bg-surface p-4 sm:p-6">{children}</div>
         </main>
       </div>

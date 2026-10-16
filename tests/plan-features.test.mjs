@@ -157,7 +157,11 @@ test("plan features modal: pending blocks submit/close; partial success retains 
   const calls = [];
   const Modal = load("features/plans/plan-features-modal.tsx", {
     react: { useState: () => { const index = cursor++; return [state[index], (value) => { state[index] = typeof value === "function" ? value(state[index]) : value; }]; } },
-    antd: { Alert: "alert", Button: "button", Modal: "modal", ConfigProvider: "config-provider" },
+    antd: { Alert: "alert", Button: "button", Modal: "modal", ConfigProvider: "config-provider", App: { useApp: () => ({ message: {
+      success: (message) => calls.push(["success", message]),
+      warning: (message) => calls.push(["warning", message]),
+      error: (message) => calls.push(["error", message]),
+    } }) } },
     "@hookform/resolvers/zod": { zodResolver: () => {} },
     "react-hook-form": { useForm: () => ({ control: {}, handleSubmit: (callback) => () => callback({ values }), getValues: () => ({ values }), reset: (data) => { values = data.values; } }) },
     "@/components/form/form-switch": { __esModule: true, default: "switch" },
@@ -189,6 +193,15 @@ test("plan features modal: pending blocks submit/close; partial success retains 
   assert.deepEqual(state[0], [second]);
   assert.deepEqual(values, [{ feature_id: 10, enabled: false, limit_value: null }]);
   assert.deepEqual(state[1], { added: 1, failed: 1, message: "safe error" });
+  assert.equal(calls.filter((call) => call[0] === "warning").length, 1);
+  assert.ok(calls.some((call) => call[0] === "warning" && call[1] === "Features: 1 added, 1 failed."));
   assert.deepEqual(calls.at(-2), ["cache", [record]]);
   assert.deepEqual(calls.at(-1), ["invalidate", { queryKey: ["plans", 7, "features"] }]);
+  await mutation.onSuccess([{ status: "rejected", reason: new Error("secret") }], values);
+  assert.equal(calls.filter((call) => call[0] === "error").length, 1);
+  assert.deepEqual(state[0], [second]);
+  await mutation.onSuccess([{ status: "fulfilled", value: { ...record, feature_id: 10 } }], values);
+  assert.equal(calls.filter((call) => call[0] === "success").length, 1);
+  assert.deepEqual(state[0], []);
+  assert.deepEqual(values, []);
 });

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useLayoutEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ConfigProvider, theme } from "antd";
+import { App, ConfigProvider, theme } from "antd";
 import { getThemeSnapshot, getServerThemeSnapshot, subscribeTheme, type ThemePreference } from "@/lib/theme";
 
 const AppearanceContext = createContext<ThemePreference>("system");
@@ -64,7 +64,9 @@ export default function Providers({ children }: { children: ReactNode }) {
       },
     }}>
       <AppearanceContext.Provider value={preference}>
-        <QueryClientProvider client={queryClient}><div className="themed-app">{children}</div></QueryClientProvider>
+        <App message={{ duration: 3, maxCount: 3, top: 24 }}>
+          <QueryClientProvider client={queryClient}><div className="themed-app">{children}</div></QueryClientProvider>
+        </App>
       </AppearanceContext.Provider>
     </ConfigProvider>
   );

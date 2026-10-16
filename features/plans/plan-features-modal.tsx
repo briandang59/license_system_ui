@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Alert, Button, ConfigProvider, Modal } from "antd";
+import { Alert, App, Button, ConfigProvider, Modal } from "antd";
 import { Info, Plus } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,6 +14,7 @@ import { planService } from "@/features/plans/service";
 import { getApiErrorMessage } from "@/lib/api-errors";
 
 export default function PlanFeaturesModal({ plan, onClose }: { plan: Plan; onClose: () => void }) {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const [selected, setSelected] = useState<FeatureOption[]>([]);
   const [feedback, setFeedback] = useState<{ added: number; failed: number; message?: string } | null>(null);
@@ -28,10 +29,15 @@ export default function PlanFeaturesModal({ plan, onClose }: { plan: Plan; onClo
   });
   const save = useMutation({
     mutationFn: (items: PlanFeatureInput[]) => planService.addFeatures(plan.id, items),
+    onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: async (results, items) => {
       const failedIds = items.filter((_, index) => results[index].status === "rejected").map((item) => item.feature_id);
       const firstError = results.find((result) => result.status === "rejected");
       const added = results.length - failedIds.length;
+      const summary = `Features: ${added} added, ${failedIds.length} failed.`;
+      if (!failedIds.length) void message.success(summary);
+      else if (added) void message.warning(summary);
+      else void message.error(summary);
       queryClient.setQueryData(["plans", plan.id, "features"], (previous: Awaited<ReturnType<typeof planService.getFeatures>> | undefined) => [
         ...(previous ?? []), ...results.flatMap((result) => result.status === "fulfilled" ? [result.value] : []),
       ]);
@@ -53,11 +59,11 @@ export default function PlanFeaturesModal({ plan, onClose }: { plan: Plan; onClo
       closable={!save.isPending} keyboard={!save.isPending} mask={{ closable: !save.isPending }}
       onCancel={() => { if (!save.isPending) onClose(); }}>
       <p className="mt-3 mb-5 max-w-xl text-sm leading-6 text-muted">Choose what this plan includes. Select a feature to set its availability and usage limit.</p>
-      {(assigned.isError || save.isError) && <div role="alert" className="mb-4">
-        <Alert type="error" title={getApiErrorMessage(save.error ?? assigned.error)}
+      {assigned.isError && <div role="alert" className="mb-4">
+        <Alert type="error" title={getApiErrorMessage(assigned.error)}
           action={assigned.isError ? <Button onClick={() => void assigned.refetch()}>Retry</Button> : undefined} />
       </div>}
-      {feedback && <div role="status" className="mb-4">
+      {feedback && feedback.failed > 0 && <div role="status" className="mb-4">
         <Alert type={feedback.failed ? "warning" : "success"}
           title={`${feedback.added} added, ${feedback.failed} failed.`}
           description={feedback.failed ? `${feedback.message} Failed selections are kept. Retry with Add selected.` : undefined} />

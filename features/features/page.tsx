@@ -3,6 +3,7 @@
 import { useState, type Key } from "react";
 import {
   Alert,
+  App,
   Button,
   Descriptions,
   Input,
@@ -22,6 +23,7 @@ import { getFeatureColumns } from "@/features/features/columns";
 import { getFeatureDescriptionItems } from "@/features/features/descriptions";
 
 export default function FeaturesPage() {
+  const { message } = App.useApp();
   const queryClient = useQueryClient();
   const [offset, setOffset] = useState(0);
   const [search, setSearch] = useState("");
@@ -42,7 +44,9 @@ export default function FeaturesPage() {
   });
   const remove = useMutation({
     mutationFn: featureService.remove,
+    onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: async () => {
+      void message.success("Feature deleted.");
       setSelectedRowKeys([]);
       if (features.data?.items.length === 1 && offset > 0)
         setOffset(offset - 20);
@@ -63,16 +67,15 @@ export default function FeaturesPage() {
           Add feature
         </Button>
       </div>
-      {(features.isError || remove.isError) && (
+      {features.isError && (
         <div role="alert" className="mb-5">
           <Alert
             type="error"
-            title={getApiErrorMessage(remove.error ?? features.error)}
+            title={getApiErrorMessage(features.error)}
             action={
               <Button
                 icon={<RotateCw size={16} aria-hidden="true" />}
                 onClick={() => {
-                  remove.reset();
                   void features.refetch();
                 }}
               >
