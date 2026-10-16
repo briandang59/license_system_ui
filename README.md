@@ -2,6 +2,22 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+### Docker
+
+Build và chạy UI production bằng Docker Compose (Linux containers):
+
+```bash
+docker compose up -d --build
+```
+
+Mở `http://localhost:3000`. Xem log bằng `docker compose logs -f ui`; dừng bằng `docker compose down`.
+
+Compose mặc định gọi backend trên máy host tại `http://host.docker.internal:5000/api/v1`. `localhost` bên trong container là chính container, không phải máy host. Backend cần lắng nghe trên interface mà container truy cập được. Nếu backend ở máy khác hoặc container cùng network, đặt `DOCKER_API_BASE_URL` thành URL phù hợp.
+
+Có thể đặt `DOCKER_API_BASE_URL` và `UI_PORT` trong file `.env` tại repo root (xem `.env.example`). Các giá trị này được Compose truyền lúc chạy; file `.env*` thực tế không được đưa vào image. `API_BASE_URL` vẫn dành cho chạy ứng dụng trực tiếp ngoài Docker. Sau khi đổi cấu hình, chạy lại `docker compose up -d`.
+
+Image dùng Next.js standalone, chạy bằng user `node`, bao gồm `public` và `.next/static`. Khi triển khai qua domain, dùng HTTPS/reverse proxy vì cookie xác thực production có cờ `Secure`; proxy cần giữ đúng host/origin để request thay đổi dữ liệu vượt qua kiểm tra same-origin.
+
 ### Authentication
 
 Visit `/auth/login` for the React Hook Form + Zod login form. TanStack Query manages the login request state.
