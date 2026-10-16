@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Alert, Button, ConfigProvider, Modal } from "antd";
-import { Info, ListPlus, Plus } from "lucide-react";
+import { Info, Plus } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -45,15 +45,14 @@ export default function PlanFeaturesModal({ plan, onClose }: { plan: Plan; onClo
 
   return (
     <Modal title={<div className="flex items-center gap-3 pr-7">
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600"><ListPlus size={22} aria-hidden="true" /></span>
       <div className="min-w-0">
-        <div className="text-lg font-semibold text-slate-900">Add features</div>
-        <div className="mt-0.5 text-sm font-normal text-slate-500">Plan <span className="font-medium text-slate-700 wrap-anywhere">{plan.name}</span></div>
+        <div className="mb-1 text-sm font-normal text-muted">{plan.name}</div>
+        <div className="text-xl font-semibold tracking-tight text-foreground">Configure plan features</div>
       </div>
     </div>} open width={1060} style={{ top: 32 }} footer={null}
       closable={!save.isPending} keyboard={!save.isPending} mask={{ closable: !save.isPending }}
       onCancel={() => { if (!save.isPending) onClose(); }}>
-      <p className="mt-4 mb-5 text-sm text-slate-500">Choose features and configure what’s included in this plan.</p>
+      <p className="mt-3 mb-5 max-w-xl text-sm leading-6 text-muted">Choose what this plan includes. Select a feature to set its availability and usage limit.</p>
       {(assigned.isError || save.isError) && <div role="alert" className="mb-4">
         <Alert type="error" title={getApiErrorMessage(save.error ?? assigned.error)}
           action={assigned.isError ? <Button onClick={() => void assigned.refetch()}>Retry</Button> : undefined} />
@@ -71,7 +70,7 @@ export default function PlanFeaturesModal({ plan, onClose }: { plan: Plan; onClo
       })}>
         <ConfigProvider theme={{ components: {
           Form: { itemMarginBottom: 0, verticalLabelPadding: "0 0 4px" },
-          Table: { cellPaddingBlockSM: 12, cellPaddingInlineSM: 12, headerBg: "#f8fafc", borderColor: "#e2e8f0", rowSelectedBg: "#f0f7ff", rowSelectedHoverBg: "#e6f2ff" },
+          Table: { cellPaddingBlockSM: 12, cellPaddingInlineSM: 12 },
         } }}>
         <FeaturePicker productId={plan.product_id} assignedFeatureIds={assigned.data?.map((item) => item.feature_id) ?? []}
           selectedIds={selected.map((feature) => feature.id)}
@@ -84,7 +83,7 @@ export default function PlanFeaturesModal({ plan, onClose }: { plan: Plan; onClo
           }}
           renderConfiguration={(feature) => {
             const index = selected.findIndex((item) => item.id === feature.id);
-            if (index === -1) return <span className="text-xs text-slate-400">Select to configure</span>;
+            if (index === -1) return <span className="text-xs text-muted">Select to configure</span>;
             return <div className="flex items-start gap-4">
               <div className="w-16 shrink-0">
                 <FormSwitch control={control} name={`values.${index}.enabled`}
@@ -94,13 +93,13 @@ export default function PlanFeaturesModal({ plan, onClose }: { plan: Plan; onClo
                 <FormInputNumber control={control} name={`values.${index}.limit_value`}
                   label={<>Limit<span className="sr-only"> for {feature.name}</span></>}
                   suffix={feature.unit} min={0} max={Number.MAX_SAFE_INTEGER} placeholder="Not set" disabled={save.isPending} />
-              </div> : feature.feature_type === "unlimited" ? <span className="pt-7 text-sm text-slate-500">No limit</span> : null}
+              </div> : feature.feature_type === "unlimited" ? <span className="pt-7 text-sm text-muted">No limit</span> : null}
             </div>;
           }}
         />
         </ConfigProvider>
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-5">
-          <p className="flex items-center gap-2 text-xs text-slate-500"><Info size={14} className="shrink-0" aria-hidden="true" />Empty limit = not configured. Zero is a valid limit.</p>
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-5">
+          <p className="flex items-center gap-2 text-xs text-muted"><Info size={14} className="shrink-0" aria-hidden="true" />Leave the limit empty to configure it later. Zero is allowed.</p>
           <div className="ml-auto flex gap-2">
           <Button disabled={save.isPending} onClick={onClose}>Cancel</Button>
           <Button type="primary" htmlType="submit" icon={<Plus size={16} aria-hidden="true" />} loading={save.isPending}

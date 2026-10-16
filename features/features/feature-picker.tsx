@@ -41,7 +41,7 @@ export default function FeaturePicker({
           enterButton={<Button aria-label="Search features" title="Search features" icon={<Search size={16} aria-hidden="true" />} />}
           onSearch={(value, event) => { event?.preventDefault(); setSearch(value.trim()); changePage(0); }}
         />
-        <span className={`rounded-full px-3 py-1 text-xs font-medium ${selectedIds.length ? "bg-blue-50 text-blue-700" : "bg-slate-100 text-slate-500"}`} aria-live="polite">
+        <span className={`rounded-md px-3 py-1.5 text-xs font-medium ${selectedIds.length ? "bg-accent-soft text-accent" : "bg-surface-subtle text-muted"}`} aria-live="polite">
           {selectedIds.length} selected
         </span>
       </div>
@@ -51,7 +51,7 @@ export default function FeaturePicker({
             action={<Button icon={<RotateCw size={16} aria-hidden="true" />} onClick={() => void features.refetch()}>Retry</Button>} />
         </div>
       )}
-      <div className="overflow-hidden rounded-xl border border-slate-200">
+      <div className="overflow-hidden rounded-lg border border-line">
       <Table<Feature>
         rowKey="id" size="small" loading={features.isFetching}
         dataSource={features.data?.items ?? []} pagination={false} scroll={{ x: 930, y: "min(420px, 45vh)" }}
@@ -64,31 +64,31 @@ export default function FeaturePicker({
           }),
         }}
         columns={[
-          { title: "#", key: "index", width: 50, render: (_, __, index) => <span className="text-slate-400">{offset + index + 1}</span> },
+          { title: "#", key: "index", width: 50, render: (_, __, index) => <span className="text-muted">{offset + index + 1}</span> },
           { title: "Feature", key: "feature", width: 260, render: (_, feature) => <div className="min-w-0 py-1">
-            <div className="font-medium text-slate-800 wrap-anywhere">{feature.name}</div>
-            <div className="mt-1 font-mono text-xs text-slate-400 wrap-anywhere">{feature.code}</div>
+            <div className="font-medium text-foreground wrap-anywhere">{feature.name}</div>
+            <div className="mt-1 text-xs text-muted wrap-anywhere">{feature.code}</div>
           </div> },
           { title: "Type", dataIndex: "feature_type", width: 115, render: (type: Feature["feature_type"]) =>
-            <Tag color={type === "quantity" ? "blue" : type === "unlimited" ? "purple" : "default"}>
+            <span className="text-xs text-muted">
               {type === "quantity" ? "Quantity" : type === "unlimited" ? "Unlimited" : "Boolean"}
-            </Tag>,
+            </span>,
           },
           { title: "Configuration", key: "configuration", width: 310, render: (_, feature) => renderConfiguration(feature) },
           { title: "Status", key: "availability", width: 150, render: (_, feature) =>
             assignedFeatureIds.includes(feature.id) ? <Tag>Already added</Tag>
               : feature.product_id !== productId ? <Tag title="Only features from the plan's product can be added.">Different product</Tag>
-                : <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />Available</span>,
+                : <span className="text-xs text-positive">Available</span>,
           },
         ]}
       />
       </div>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-        <span className="text-xs text-slate-500">Only features from this plan’s product can be added.</span>
+        <span className="text-xs text-muted">Only features from this plan’s product can be added.</span>
         <div className="flex items-center gap-2">
         <Button size="small" icon={<ChevronLeft size={14} aria-hidden="true" />} disabled={disabled || offset === 0 || features.isFetching}
           onClick={() => changePage(offset - 20)}>Previous</Button>
-        <span className="px-2 text-xs text-slate-500">Page {offset / 20 + 1}</span>
+        <span className="px-2 text-xs text-muted">Page {offset / 20 + 1}</span>
         <Button size="small" icon={<ChevronRight size={14} aria-hidden="true" />}
           disabled={disabled || features.isFetching || features.isError || (features.data?.items.length ?? 0) < 20}
           onClick={() => changePage(offset + 20)}>Next</Button>

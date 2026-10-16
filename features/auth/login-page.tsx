@@ -34,7 +34,7 @@ export default function LoginPage() {
           <h1 className="text-3xl font-semibold tracking-tight">
             Welcome back
           </h1>
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-muted">
             Sign in to manage your licenses.
           </p>
           <form

@@ -55,7 +55,7 @@ export default function CompaniesPage() {
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">Companies</h1>
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-muted">
             Create and manage your companies.
           </p>
         </div>
@@ -95,7 +95,7 @@ export default function CompaniesPage() {
             setSelectedRowKeys([]);
           }}
         />
-        <span className="text-sm text-slate-500" aria-live="polite">{selectedRowKeys.length} selected</span>
+        <span className="text-sm text-muted" aria-live="polite">{selectedRowKeys.length} selected</span>
       </div>
       <Table<Company>
         rowKey="id"
@@ -125,7 +125,7 @@ export default function CompaniesPage() {
         >
           Previous
         </Button>
-        <span className="text-sm text-slate-500">Page {offset / 20 + 1}</span>
+        <span className="text-sm text-muted">Page {offset / 20 + 1}</span>
         <Button
           icon={<ChevronRight size={16} aria-hidden="true" />}
           disabled={
