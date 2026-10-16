@@ -40,3 +40,29 @@ export type PlanUpdate = z.infer<typeof planUpdateSchema>;
 export type PlanForm = z.infer<typeof planFormSchema>;
 export type PlanList = z.infer<typeof planListSchema>;
 export type Plan = z.infer<typeof planSchema>;
+
+export const planFeatureInputSchema = z.strictObject({
+  feature_id: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+  enabled: z.boolean().optional(),
+  limit_value: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER).nullable().optional(),
+});
+export const planFeatureSchema = planFeatureInputSchema.extend({
+  enabled: z.boolean(),
+  limit_value: planFeatureInputSchema.shape.limit_value.unwrap(),
+  id: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+  plan_id: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+export const planFeatureListSchema = z.object({
+  items: z.array(planFeatureSchema),
+  limit: z.number().int().positive().max(100),
+  offset: z.number().int().nonnegative(),
+});
+export const planFeaturesFormSchema = z.object({
+  values: z.array(planFeatureInputSchema.required()),
+});
+export type PlanFeatureInput = z.infer<typeof planFeatureInputSchema>;
+export type PlanFeature = z.infer<typeof planFeatureSchema>;
+export type PlanFeatureList = z.infer<typeof planFeatureListSchema>;
+export type PlanFeaturesForm = z.infer<typeof planFeaturesFormSchema>;

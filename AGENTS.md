@@ -95,6 +95,21 @@ features/
 - Lỗi API hiển thị qua `getApiErrorMessage`; không hiển thị nguyên lỗi backend hoặc thông tin nhạy cảm.
 - Chỉ tách component/helper khi có trách nhiệm rõ hoặc tái sử dụng thực tế; không tạo sẵn hook/service/repository factory cho tính năng chưa tồn tại.
 
+## Thiết kế giao diện và dark mode
+
+- Khi xây dựng hoặc chỉnh bố cục/giao diện, đọc skill [.agents/skills/frontend-design/SKILL.md](.agents/skills/frontend-design/SKILL.md) cùng skill repository. Áp dụng nguyên tắc thiết kế trong giới hạn Ant Design và kiến trúc hiện có; không thay bộ controls, thêm dependency hoặc thiết kế lại toàn ứng dụng chỉ để đổi một màn hình.
+- Trước khi viết UI, trình bày ngắn hướng thiết kế: tác vụ chính, thứ bậc thông tin, bố cục căn chỉnh, typography, khoảng cách và 4–6 màu chủ đạo có vai trò rõ ở cả light/dark. Tự đối chiếu với yêu cầu rồi triển khai trong phạm vi đã được giao; không cần thêm vòng duyệt nếu người dùng đã cho phép làm.
+- Định hướng sản phẩm là workspace quản trị license: rõ ràng, chính xác, dễ quét dữ liệu và cấu hình quyền lợi. Tạo chất lượng qua typography, căn chỉnh, mật độ thông tin và trạng thái thao tác; tránh trang trí không phục vụ tác vụ như gradient nền, card lồng card, icon lớn trong mọi tiêu đề hoặc badge cho mọi giá trị.
+- Dùng thang chữ và spacing nhất quán; ưu tiên font đang có, chỉ đổi/thêm font khi có lý do cụ thể và thuộc phạm vi yêu cầu. Giữ UI sentence case và ngôn ngữ hiện có; code nghiệp vụ vẫn giữ nguyên cách viết. Nội dung hướng dẫn ngắn, nằm gần thao tác cần giải thích.
+- Bảng/modal cấu hình phải gọn và ổn định: có thể gom tên/code theo thứ bậc chính/phụ, đặt controls liên quan cạnh nhau khi đủ chỗ và không lặp tên bản ghi trong mọi label nhìn thấy. Vẫn giữ accessible name theo bản ghi, lỗi theo field, quy ước cột `#`, selection và actions đã nêu. Danh sách dài cuộn trong vùng phù hợp; footer và hành động chính dễ tìm trên màn hình nhỏ.
+- UI mới hoặc được thiết kế lại phải hỗ trợ light và dark. Với UI cũ ngoài phạm vi, ghi rõ giới hạn còn lại; không tuyên bố toàn ứng dụng đã hỗ trợ dark mode khi mới sửa một component.
+- Khi triển khai theme, tích hợp tại `app/providers.tsx` bằng `ConfigProvider` và `theme.defaultAlgorithm` / `theme.darkAlgorithm` của Ant Design; giữ QueryClientProvider và registry hiện có. Các provider theme cục bộ chỉ ghi đè token thực sự cần, không áp lại bảng màu sáng làm mất theme cha.
+- Dùng semantic tokens cho màu nền trang, bề mặt, chữ chính/phụ, viền, accent và trạng thái. Controls dùng Ant Design tokens; phần UI tự viết dùng `theme.useToken()` hoặc CSS variables ánh xạ nhất quán với theme. Không rải màu hex hoặc utility màu chỉ đúng ở light mode vào từng component; token cho hover/selected/disabled/error cũng phải phù hợp cả hai theme. Màu cố định của tài nguyên thương hiệu chỉ dùng khi đã kiểm tra trên cả hai nền.
+- Khi làm tính năng đổi theme, có lựa chọn Light/Dark/System, mặc định System nếu chưa có lựa chọn đã lưu; chỉ theo thay đổi hệ điều hành khi ở System. Có thể lưu riêng tùy chọn giao diện trong localStorage; không liên quan token đăng nhập. Xử lý SSR/hydration và màu nền ban đầu để tránh hydration mismatch hoặc chớp nền sáng; không dùng `suppressHydrationWarning` để che lỗi chưa hiểu rõ.
+- Theme phải phủ cả layout, bảng, forms, dropdown, tooltip, modal/drawer và các popup render qua portal. Không chỉ đổi nền trang hoặc đảo màu bằng CSS filter. Hạn chế selectors phụ thuộc class nội bộ Ant Design; ưu tiên component props, theme tokens và styles được hỗ trợ.
+- Giữ tương phản chữ thường tối thiểu 4.5:1, focus bàn phím nhìn rõ và không dùng màu làm tín hiệu duy nhất. Kiểm tra hover/selected/disabled/error/loading/empty, nội dung dài, zoom và bố cục mobile; animation ngắn phục vụ phản hồi thao tác và tôn trọng `prefers-reduced-motion`.
+- Khi sửa UI, xem và tự đánh giá ảnh chụp light/dark trên desktop/mobile nếu có môi trường truy cập được; kiểm tra cả trạng thái đã chọn và lỗi validation, không chỉ màn hình trống. Nếu thiếu phiên đăng nhập hoặc không chạy được browser, báo rõ phần chưa kiểm tra; không bỏ qua xác thực hoặc tạo đường truy cập thử trong sản phẩm.
+
 ## Ràng buộc API và xác thực
 
 - `API_BASE_URL` chỉ dùng phía server; không đổi thành biến `NEXT_PUBLIC_*`. Không đọc/in giá trị bí mật từ `.env*`; khi cần cấu hình mới chỉ thêm tên và giá trị mẫu an toàn vào `.env.example`.

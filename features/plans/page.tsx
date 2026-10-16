@@ -20,12 +20,14 @@ import { planService } from "@/features/plans/service";
 import { getApiErrorMessage } from "@/lib/api-errors";
 import { getPlanColumns } from "@/features/plans/columns";
 import { getPlanDescriptionItems } from "@/features/plans/descriptions";
+import PlanFeaturesModal from "@/features/plans/plan-features-modal";
 
 export default function PlansPage() {
   const queryClient = useQueryClient();
   const [offset, setOffset] = useState(0);
   const [search, setSearch] = useState("");
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+  const [featurePlan, setFeaturePlan] = useState<Plan | null>(null);
   const [dialog, setDialog] = useState<{
     mode: "create" | "edit" | "view";
     id?: number;
@@ -110,6 +112,7 @@ export default function PlansPage() {
         scroll={{ x: 700 }}
         columns={getPlanColumns({
           offset,
+          onAddFeatures: setFeaturePlan,
           onView: (id) => setDialog({ mode: "view", id }),
           onEdit: (id) => setDialog({ mode: "edit", id }),
           onDelete: (id) => remove.mutate(id),
@@ -181,6 +184,7 @@ export default function PlansPage() {
           ))
         )}
       </Modal>
+      {featurePlan && <PlanFeaturesModal key={featurePlan.id} plan={featurePlan} onClose={() => setFeaturePlan(null)} />}
     </div>
   );
 }

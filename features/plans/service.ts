@@ -5,9 +5,31 @@ import type {
   PlanInput,
   PlanUpdate,
   PlanList,
+  PlanFeature,
+  PlanFeatureInput,
+  PlanFeatureList,
 } from "@/features/plans/schema";
 
 export const planService = {
+  getFeatures: async (id: number, signal?: AbortSignal) => {
+    const items: PlanFeature[] = [];
+    let offset = 0;
+    while (true) {
+      const query = new URLSearchParams({ offset: String(offset) });
+      const page = await api<PlanFeatureList>(`${planUrls.features(id)}?${query}`, { signal });
+      items.push(...page.items);
+      if (page.items.length < page.limit) return items;
+      offset += page.limit;
+    }
+  },
+  addFeatures: (id: number, items: PlanFeatureInput[]) =>
+    Promise.allSettled(items.map((data) =>
+      api<PlanFeature>(planUrls.features(id), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }),
+    )),
   getAll: (offset = 0, signal?: AbortSignal, search = "") => {
     const query = new URLSearchParams({ limit: "20", offset: String(offset) });
     if (search.trim()) query.set("search", search.trim());

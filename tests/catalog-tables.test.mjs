@@ -38,6 +38,7 @@ for (const [name, plural] of [["product", "products"], ["company", "companies"],
       onView: (id) => calls.push(["view", id]),
       onEdit: (id) => calls.push(["edit", id]),
       onDelete: (id) => calls.push(["delete", id]),
+      onAddFeatures: (plan) => calls.push(["addFeatures", plan.id]),
     });
     assert.equal(columns[0].render(null, {}, 0), 41);
     assert.equal(columns[0].render(null, {}, 19), 60);
@@ -46,7 +47,8 @@ for (const [name, plural] of [["product", "products"], ["company", "companies"],
     const items = descriptionsModule[`get${cap}DescriptionItems`](record);
     assert.ok(items.every(({ key }) => !/(^|_)id$/.test(key)));
     const actions = columns.at(-1).render(null, record);
-    const [view, edit, remove] = find(actions, "button");
+    const buttons = find(actions, "button");
+    const [view, edit, remove] = name === "plan" ? buttons.slice(1) : buttons;
     for (const button of [view, edit, remove]) {
       assert.ok(button.props["aria-label"].includes("Example"));
       assert.ok(button.props.title);
@@ -57,6 +59,11 @@ for (const [name, plural] of [["product", "products"], ["company", "companies"],
     edit.props.onClick();
     find(actions, "confirm")[0].props.onConfirm();
     assert.deepEqual(calls, [["view", 99], ["edit", 99], ["delete", 99]]);
+    if (name === "plan") {
+      buttons[0].props.onClick();
+      assert.deepEqual(calls.at(-1), ["addFeatures", 99]);
+      assert.match(buttons[0].props["aria-label"], /Example/);
+    }
   });
 
   test(`${plural}: service and handler safely forward trimmed backend search and omit empty search`, async () => {
@@ -118,6 +125,7 @@ for (const [name, plural] of [["product", "products"], ["company", "companies"],
       [`@/features/${plural}/columns`]: columnsModule,
       [`@/features/${plural}/descriptions`]: descriptionsModule,
       "@/lib/api-errors": { getApiErrorMessage: () => "Request failed" },
+      "@/features/plans/plan-features-modal": { default: "plan-features-modal" },
     };
     const Page = load(`features/${plural}/page.tsx`, imports).default;
     const render = () => { cursor = 0; queries.length = 0; return Page(); };

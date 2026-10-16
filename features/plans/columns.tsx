@@ -1,5 +1,5 @@
 import { Button, Popconfirm, Space, Tag, type TableProps } from "antd";
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { Eye, Pencil, Trash2, ListPlus } from "lucide-react";
 import type { Plan } from "@/features/plans/schema";
 
 type PlanColumnActions = {
@@ -7,6 +7,7 @@ type PlanColumnActions = {
   onView: (id: number) => void;
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
+  onAddFeatures: (plan: Plan) => void;
   isDeleting: boolean;
   deletingId?: number;
 };
@@ -16,6 +17,7 @@ export function getPlanColumns({
   onView,
   onEdit,
   onDelete,
+  onAddFeatures,
   isDeleting,
   deletingId,
 }: PlanColumnActions): NonNullable<TableProps<Plan>["columns"]> {
@@ -36,6 +38,9 @@ export function getPlanColumns({
       title: "Actions",
       render: (_, plan) => (
         <Space>
+          <Button size="small" icon={<ListPlus size={16} aria-hidden="true" />}
+            aria-label={`Add features to plan ${plan.name}`} title="Add features"
+            onClick={() => onAddFeatures(plan)} />
           <Button size="small" icon={<Eye size={16} aria-hidden="true" />}
             aria-label={`View plan ${plan.name}`} title="View plan"
             onClick={() => onView(plan.id)} />

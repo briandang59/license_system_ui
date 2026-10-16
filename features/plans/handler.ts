@@ -5,6 +5,9 @@ import {
   planUpdateSchema,
   planSchema,
   planListSchema,
+  planFeatureInputSchema,
+  planFeatureSchema,
+  planFeatureListSchema,
 } from "@/features/plans/schema";
 
 function failure(status: number, code: string) {
@@ -14,7 +17,7 @@ function failure(status: number, code: string) {
   );
 }
 
-export async function handlePlan(request: Request, id?: string) {
+export async function handlePlan(request: Request, id?: string, resource?: "features") {
   const method = request.method;
   if (
     method !== "GET" &&
@@ -28,12 +31,13 @@ export async function handlePlan(request: Request, id?: string) {
   if (!token) return failure(401, "UNAUTHORIZED");
   if (id !== undefined && (!/^[1-9]\d*$/.test(id) || !Number.isSafeInteger(Number(id))))
     return failure(400, "VALIDATION_ERROR");
-  if (!(id ? ["GET", "PATCH", "DELETE"] : ["GET", "POST"]).includes(method))
+  if (resource && !id) return failure(400, "VALIDATION_ERROR");
+  if (!(id && !resource ? ["GET", "PATCH", "DELETE"] : ["GET", "POST"]).includes(method))
     return failure(405, "METHOD_NOT_ALLOWED");
   let body;
   if (method === "POST" || method === "PATCH") {
     const parsed = (
-      method === "POST" ? planInputSchema : planUpdateSchema
+      resource ? planFeatureInputSchema : method === "POST" ? planInputSchema : planUpdateSchema
     ).safeParse(await request.json().catch(() => null));
     if (!parsed.success) return failure(400, "VALIDATION_ERROR");
     body = parsed.data;
@@ -45,7 +49,9 @@ export async function handlePlan(request: Request, id?: string) {
   const search = params.get("search")?.trim() ?? "";
   const query = new URLSearchParams({ limit: "20", offset });
   if (method === "GET" && search) query.set("search", search);
-  const path = id ? `/plans/${id}` : `/plans?${query}`;
+  const path = resource
+    ? `/plans/${id}/features${method === "GET" ? `?${new URLSearchParams({ limit: "20", offset })}` : ""}`
+    : id ? `/plans/${id}` : `/plans?${query}`;
   try {
     const response = await fetch(
       `${process.env.API_BASE_URL ?? "http://localhost:5000/api/v1"}${path}`,
@@ -77,7 +83,9 @@ export async function handlePlan(request: Request, id?: string) {
     const result = z
       .object({
         success: z.literal(true),
-        data: method === "GET" && !id ? planListSchema : planSchema,
+        data: resource
+          ? method === "GET" ? planFeatureListSchema : planFeatureSchema
+          : method === "GET" && !id ? planListSchema : planSchema,
       })
       .safeParse(json);
     if (!result.success) return failure(502, "INVALID_RESPONSE");
