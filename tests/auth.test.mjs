@@ -18,8 +18,8 @@ function load(path, imports = {}) {
 }
 
 const schemas = load("features/auth/schema.ts");
-const { handleAuth } = load("features/auth/server/handler.ts", { "@/features/auth/schema": schemas });
-const { POST } = load("app/api/auth/login/route.ts", { "@/features/auth/server/handler": { handleAuth } });
+const { handleAuth } = load("features/auth/handler.ts", { "@/features/auth/schema": schemas });
+const { POST } = load("app/api/auth/login/route.ts", { "@/features/auth/handler": { handleAuth } });
 const { proxy, config } = load("proxy.ts");
 const { NextRequest } = loadDependency("next/server");
 const { unstable_doesMiddlewareMatch } = loadDependency("next/experimental/testing/server");
@@ -66,7 +66,7 @@ test("configured public origin accepts Docker requests and rejects foreign or mi
   global.fetch = () => { throw new Error("Backend must not be called for invalid input"); };
   try {
     const productSchemas = load("features/products/schema.ts");
-    const { handleProduct } = load("features/products/server/handler.ts", { "@/features/products/schema": productSchemas });
+    const { handleProduct } = load("features/products/handler.ts", { "@/features/products/schema": productSchemas });
     for (const origin of [process.env.APP_ORIGIN, "https://other.example", null]) {
       const headers = { "Content-Type": "application/json", cookie: "access_token=test" };
       if (origin) headers.origin = origin;

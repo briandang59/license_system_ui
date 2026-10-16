@@ -28,7 +28,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 | `features/<domain>/service.ts` | Gọi API same-origin qua `api<T>`; không chứa UI, cookie/token logic |
 | `features/<domain>/urls.ts` | Đường dẫn API same-origin của domain |
 | `features/<domain>/use-*.ts` | Hook nghiệp vụ khi cần, ví dụ auth logout |
-| `features/<domain>/server/handler.ts` | Kiểm tra request/cookie, gọi backend, kiểm tra response và trả HTTP response |
+| `features/<domain>/handler.ts` | Kiểm tra request/cookie, gọi backend, kiểm tra response và trả HTTP response |
 | `lib/api.ts`, `lib/api-errors.ts`, `lib/baseResponse.ts` | HTTP client, lỗi và response contract dùng chung |
 | `components/form/`, `components/layouts/` | Form controls và layouts tái sử dụng |
 | `components/ui/` | UI dùng chung khi thực sự có nhu cầu tái sử dụng |
@@ -49,27 +49,28 @@ features/
     schema.ts
     service.ts
     urls.ts
-    server/handler.ts
+    handler.ts
   products/
     page.tsx
     form.tsx
     schema.ts
     service.ts
     urls.ts
-    server/handler.ts
+    handler.ts
 ```
 
 ### Quy tắc đặt file và chiều phụ thuộc
 
 - Mọi domain dùng `features/<domain>/`, bao gồm auth. Không đặt lại service domain ở `services/`, schema domain ở `lib/` hoặc URL domain trong `utils/`.
 - `app/` giữ route entry, layout, providers, metadata, loading/error boundaries và styles toàn cục. Trang có nghiệp vụ gọi/re-export màn hình từ feature; trang tĩnh đơn giản có thể ở lại `app/`. Providers giữ tại `app/providers.tsx`.
-- Giữ file phẳng khi feature còn nhỏ; code chỉ chạy server đặt trong `server/`. Chỉ thêm thư mục con khi thực tế cần, không dựng sẵn thư mục rỗng, barrel export hoặc factory.
+- Giữ file phẳng khi feature còn nhỏ. Handler luôn đặt tại `features/<domain>/handler.ts`, ngang hàng với `schema.ts`, `service.ts`, `urls.ts`; không tạo thư mục `server/` để bọc handler. Chỉ thêm thư mục con khác khi thực tế cần, không dựng sẵn thư mục rỗng, barrel export hoặc factory.
 - `components/`, `lib/`, `utils/` chứa phần dùng chung có trách nhiệm rõ ràng. Schema dùng cả client và server của cùng domain vẫn thuộc feature. Không tách type chỉ để lặp lại schema.
 - Feature được import phần dùng chung; hạ tầng `lib/` và helper `utils/` không import ngược feature. Layout là điểm tích hợp được phép dùng hook/component auth; logic session thuộc `features/auth/`.
 - Không import chéo nội bộ giữa các feature hoặc tạo phụ thuộc vòng. Nếu cần chia sẻ thật, xác định phần dùng chung hoặc điểm tích hợp trước.
 - Luồng trình duyệt: **feature UI/hook → feature service → `lib/api.ts` → `app/api/*` route → feature server handler → backend**.
 - Route API khai báo HTTP methods, đọc/kiểm tra route params hoặc action rồi gọi handler. Handler kiểm tra request/response, cookie và gọi backend; không đưa logic backend vào page.
-- Không gọi backend trực tiếp từ client hoặc import `features/*/server/*` vào client. Import trực tiếp đúng module; không gom module client và server vào một barrel. Server Component có thể gọi code server trực tiếp, không bắt gọi vòng qua API nội bộ.
+- Không gọi backend trực tiếp từ client hoặc import `features/*/handler.ts` vào client. Import trực tiếp đúng module; không gom module client và server vào một barrel. Server Component có thể gọi code server trực tiếp, không bắt gọi vòng qua API nội bộ.
+- `handler.ts` chỉ chạy phía server dù nằm cùng thư mục với UI. Không thêm `"use client"` vào handler; service, UI và client hook không được import hoặc re-export handler, kể cả gián tiếp qua module dùng chung.
 - Khi di chuyển file, cập nhật imports, test mocks, tài liệu và skill; bỏ đường dẫn cũ khi không có caller cần giữ. Không dùng file `test.ts` rỗng làm placeholder; test thực thi nằm trong `tests/`.
 
 ## Quy ước triển khai

@@ -12,7 +12,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 Quy tắc đặt file, chiều phụ thuộc và kiểm tra nằm trong [AGENTS.md](AGENTS.md).
 Hướng dẫn triển khai theo repository nằm trong [skill license-system-ui](.agents/skills/license-system-ui/SKILL.md).
-Code riêng của domain nằm trong feature, kể cả schema/URL được cả client và server dùng; server handler luôn nằm trong `features/<domain>/server/`.
+Code riêng của domain nằm trong feature, kể cả schema/URL được cả client và server dùng. Handler đặt trực tiếp tại `features/<domain>/handler.ts`, ngang hàng với `schema.ts`, `service.ts`, `urls.ts`; không có thư mục `server/`. Handler chỉ chạy phía server và không được import vào client.
 
 ## Getting Started
 
