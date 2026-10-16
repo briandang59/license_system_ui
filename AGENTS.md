@@ -28,6 +28,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 | `features/<domain>/service.ts` | Gọi API same-origin qua `api<T>`; không chứa UI, cookie/token logic |
 | `features/<domain>/urls.ts` | Đường dẫn API same-origin của domain |
 | `features/<domain>/use-*.ts` | Hook nghiệp vụ khi cần, ví dụ auth logout |
+| `features/<domain>/columns.tsx`, `descriptions.ts` | Cấu hình cột Table và hàm tạo Descriptions items riêng của domain khi cần tách |
 | `features/<domain>/handler.ts` | Kiểm tra request/cookie, gọi backend, kiểm tra response và trả HTTP response |
 | `lib/api.ts`, `lib/api-errors.ts`, `lib/baseResponse.ts` | HTTP client, lỗi và response contract dùng chung |
 | `components/form/`, `components/layouts/` | Form controls và layouts tái sử dụng |
@@ -53,6 +54,8 @@ features/
   products/
     page.tsx
     form.tsx
+    columns.tsx
+    descriptions.ts
     schema.ts
     service.ts
     urls.ts
@@ -65,6 +68,7 @@ features/
 - `app/` giữ route entry, layout, providers, metadata, loading/error boundaries và styles toàn cục. Trang có nghiệp vụ gọi/re-export màn hình từ feature; trang tĩnh đơn giản có thể ở lại `app/`. Providers giữ tại `app/providers.tsx`.
 - Giữ file phẳng khi feature còn nhỏ. Handler luôn đặt tại `features/<domain>/handler.ts`, ngang hàng với `schema.ts`, `service.ts`, `urls.ts`; không tạo thư mục `server/` để bọc handler. Chỉ thêm thư mục con khác khi thực tế cần, không dựng sẵn thư mục rỗng, barrel export hoặc factory.
 - `components/`, `lib/`, `utils/` chứa phần dùng chung có trách nhiệm rõ ràng. Schema dùng cả client và server của cùng domain vẫn thuộc feature. Không tách type chỉ để lặp lại schema.
+- Cấu hình Table/Descriptions riêng của domain đặt trong feature: `columns.tsx` export hàm nhận callbacks/trạng thái thao tác, `descriptions.ts` export hàm nhận bản ghi và trả items. Dùng types `TableProps<T>["columns"]` và `DescriptionsProps["items"]` của Ant Design; file có JSX dùng `.tsx`. State, query, mutation và điều hướng giữ ở page/hook; cấu hình không tự gọi API. Không ép columns và items dùng chung một schema; chỉ đưa formatter/UI độc lập nghiệp vụ ra dùng chung khi có nhu cầu thực tế.
 - Feature được import phần dùng chung; hạ tầng `lib/` và helper `utils/` không import ngược feature. Layout là điểm tích hợp được phép dùng hook/component auth; logic session thuộc `features/auth/`.
 - Không import chéo nội bộ giữa các feature hoặc tạo phụ thuộc vòng. Nếu cần chia sẻ thật, xác định phần dùng chung hoặc điểm tích hợp trước.
 - Luồng trình duyệt: **feature UI/hook → feature service → `lib/api.ts` → `app/api/*` route → feature server handler → backend**.

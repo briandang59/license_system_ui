@@ -6,11 +6,8 @@ import {
   Button,
   Descriptions,
   Modal,
-  Popconfirm,
-  Space,
   Spin,
   Table,
-  Tag,
 } from "antd";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ProductForm } from "@/features/products/form";
@@ -19,7 +16,8 @@ import {
 } from "@/features/products/schema";
 import { productService } from "@/features/products/service";
 import { getApiErrorMessage } from "@/lib/api-errors";
-import { formatDateTime } from "@/utils/functions/formatDateTime";
+import { getProductColumns } from "@/features/products/columns";
+import { getProductDescriptionItems } from "@/features/products/descriptions";
 
 export default function ProductsPage() {
   const queryClient = useQueryClient();
@@ -84,58 +82,13 @@ export default function ProductsPage() {
         dataSource={products.data?.items ?? []}
         pagination={false}
         scroll={{ x: 700 }}
-        columns={[
-          { title: "Code", dataIndex: "code" },
-          { title: "Name", dataIndex: "name" },
-          {
-            title: "Status",
-            dataIndex: "status",
-            render: (status: string) => (
-              <Tag color={status === "active" ? "green" : "default"}>
-                {status}
-              </Tag>
-            ),
-          },
-          {
-            title: "Actions",
-            render: (_, product) => (
-              <Space>
-                <Button
-                  size="small"
-                  onClick={() => setDialog({ mode: "view", id: product.id })}
-                >
-                  View
-                </Button>
-                <Button
-                  size="small"
-                  onClick={() => setDialog({ mode: "edit", id: product.id })}
-                >
-                  Edit
-                </Button>
-                <Popconfirm
-                  title="Delete product?"
-                  description="This action cannot be undone."
-                  onConfirm={() => {
-                    if (!remove.isPending) remove.mutate(product.id);
-                  }}
-                  okText="Delete"
-                  okButtonProps={{ danger: true }}
-                >
-                  <Button
-                    size="small"
-                    danger
-                    disabled={remove.isPending}
-                    loading={
-                      remove.isPending && remove.variables === product.id
-                    }
-                  >
-                    Delete
-                  </Button>
-                </Popconfirm>
-              </Space>
-            ),
-          },
-        ]}
+        columns={getProductColumns({
+          onView: (id) => setDialog({ mode: "view", id }),
+          onEdit: (id) => setDialog({ mode: "edit", id }),
+          onDelete: (id) => remove.mutate(id),
+          isDeleting: remove.isPending,
+          deletingId: remove.variables,
+        })}
       />
       <div className="mt-4 flex items-center justify-end gap-3">
         <Button
@@ -194,30 +147,7 @@ export default function ProductsPage() {
           ) : (
             <Descriptions
               column={1}
-              items={[
-                { key: "code", label: "Code", children: detail.data.code },
-                { key: "name", label: "Name", children: detail.data.name },
-                {
-                  key: "description",
-                  label: "Description",
-                  children: detail.data.description || "—",
-                },
-                {
-                  key: "status",
-                  label: "Status",
-                  children: detail.data.status,
-                },
-                {
-                  key: "created",
-                  label: "Created",
-                  children: formatDateTime(detail.data.created_at),
-                },
-                {
-                  key: "updated",
-                  label: "Updated",
-                  children: formatDateTime(detail.data.updated_at),
-                },
-              ]}
+              items={getProductDescriptionItems(detail.data)}
             />
           ))
         )}

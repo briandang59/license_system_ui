@@ -19,6 +19,7 @@ Skill nằm tại `.agents/skills/license-system-ui/` trong repository. Xác đ�
 - **Form:** đọc `components/form/README.md`, control liên quan và `features/products/form.tsx` hoặc `features/auth/login-page.tsx`. Tái sử dụng `Form*` với `control`, `name`, `label`; `FormField` dùng chung phần label/lỗi/accessibility. Schema domain nằm trong `features/<domain>/schema.ts`, types suy ra từ schema. Giữ validation phía server dù client đã validate.
 - **Xác thực:** đọc `features/auth/handler.ts`, `features/auth/service.ts`, `features/auth/schema.ts`, `features/auth/urls.ts`, `features/auth/use-logout.ts`, `proxy.ts`, `components/layouts/admin-layout.tsx` và `tests/auth.test.mjs`; giữ các ràng buộc bảo mật và hành vi session trong `AGENTS.md`.
 - **Bố cục/provider:** đọc `app/layout.tsx`, `app/providers.tsx`, layout của route group và `components/layouts/` liên quan; không bọc thêm QueryClientProvider hoặc layout trùng lặp.
+- **Table/Descriptions:** đọc `features/products/columns.tsx`, `features/products/descriptions.ts` và caller `features/products/page.tsx`. Cấu hình thuộc feature; columns nhận callbacks/trạng thái, descriptions nhận bản ghi. Giữ state/query/mutation ở page/hook, dùng types Ant Design và `.tsx` khi có JSX. Không tạo schema cấu hình chung cho columns và items hoặc đưa cấu hình domain vào `utils/`.
 
 ## Thực hiện thay đổi đủ luồng
 
