@@ -16,7 +16,7 @@ export default function IncludedFeatures({ plan }: { plan: Plan }) {
       { title: "Loại", dataIndex: "feature_type", render: (value: string) => displayLabel(value) },
       { title: "Trạng thái sử dụng", render: (_, feature) => <Tag color={feature.enabled ? "green" : "default"}>{feature.enabled ? "Bật" : "Tắt"}</Tag> },
       { title: "Hạn mức", render: (_, feature) => feature.feature_type === "quantity"
-        ? feature.limit_value === null ? "Chưa cấu hình" : <span>{feature.limit_value.toLocaleString("vi-VN")} <UnitLabel id={feature.unit_id} fallback={feature.unit} /></span>
+        ? feature.limit_value === null ? "Chưa cấu hình" : <span>{feature.limit_value.toLocaleString("en-US")} <UnitLabel id={feature.unit_id} fallback={feature.unit} /></span>
         : feature.feature_type === "unlimited" ? "Không giới hạn" : "—" },
       { title: "Thao tác", width: 90, render: (_, feature) => <PlanFeatureEditor planId={plan.id} feature={feature} /> },
     ]}

@@ -127,6 +127,15 @@ features/
 - Refresh hiện được gọi tường minh, không tự thêm retry/refresh khi gặp 401. Logout lỗi giữ session để thử lại; logout thành công hủy query đang chạy, xóa cache và điều hướng như hiện tại.
 - Contract catalog tham chiếu Swagger `/swagger/openapi.json`: company cho sửa code; plan không cho sửa code/product; feature cho sửa product/code/type nhưng backend có thể từ chối khi đã được tham chiếu. Trường nullable gửi `null` để xóa, không đổi các giá trị thiếu thành null trong PATCH. Danh sách dùng offset, không có total. Quản lý liên kết plan-feature là endpoint riêng, không ghép vào payload plan.
 
+## Quy tắc hiển thị số tiền và ngày giờ — 20261027
+
+- Số/tiền trên cả admin và web public dùng dấu phẩy phân cách hàng nghìn và dấu chấm thập phân: 20,000,000 hoặc 1,234.50. Quy tắc này thay thế quy định vi-VN cho định dạng số/tiền phía trên theo yêu cầu ngày 27/10/2026; ngôn ngữ và ngày tháng vẫn tiếng Việt.
+- Dùng formatter dùng chung cho controls, bảng, chi tiết và lựa chọn giá. Giá trị controls/API vẫn là number, không gửi chuỗi có dấu phân cách. Giữ nguyên ý nghĩa 0/null và giới hạn số nguyên an toàn.
+- amount_minor vẫn là đơn vị tiền nhỏ nhất; nhãn phải nói rõ khi dùng đơn vị này. Giá public đổi sang đơn vị tiền chính theo số chữ số thập phân của currency.
+- Form tạo/sửa dùng FormDatePicker + Dayjs; hiển thị DD/MM/YYYY HH:mm theo Asia/Ho_Chi_Minh (UTC+07:00), không phụ thuộc múi giờ máy. Không yêu cầu nhập chuỗi ISO ở form thông thường.
+- API, lưu trữ và import/export giữ ISO/RFC3339 có offset. Parse timestamp sang giờ Việt Nam khi mở form, giữ giờ Việt Nam khi chọn ngày và chuyển ISO khi submit. Không bỏ offset hoặc đổi instant khi chỉ xem định dạng.
+- Theme Sáng/Tối/Theo hệ thống đồng bộ CSS, Ant Design và popup. Lựa chọn tường minh ưu tiên hơn hệ điều hành; mặc định Theo hệ thống.
+
 ## Kiểm tra và bàn giao
 
 - Dùng `pnpm` và giữ `pnpm-lock.yaml` đồng bộ nếu dependency thực sự thay đổi.

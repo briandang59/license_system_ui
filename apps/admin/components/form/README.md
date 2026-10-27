@@ -39,6 +39,8 @@ import FormSelect from "@/components/form/form-select";
 
 Select và TreeSelect giữ hành vi clear của Ant Design (`undefined`); dùng field optional trong schema nếu bật `allowClear`. Các control dùng giá trị nguyên thủy, không bật `labelInValue`/`treeCheckStrictly`, hoặc `stringMode` cho InputNumber. Với date/time, khởi tạo bằng `dayjs(...)` hoặc `null`, validate bằng schema nhận Dayjs và chuyển thành chuỗi theo contract backend khi submit; không truyền chuỗi ISO trực tiếp vào picker.
 
+InputNumber mặc định phân cách hàng nghìn bằng dấu phẩy (20,000,000), giữ giá trị là number; parser bỏ dấu phân cách, không đổi ô trống thành giá 0. DatePicker hiển thị DD/MM/YYYY HH:mm khi showTime và hiểu giờ chọn theo Asia/Ho_Chi_Minh. Dùng parseDateTime để mở timestamp API, vietnamNow cho mặc định và toISOString khi submit. Dữ liệu form là Dayjs hoặc null; không bắt người dùng nhập ISO.
+
 Upload không tự gửi HTTP request: `beforeUpload` luôn trả `false`, danh sách file được lưu trong form. Khi submit, kiểm tra kiểu/kích thước file và gửi `originFileObj` bằng FormData ở service theo contract backend. `accept` chỉ hỗ trợ lọc file trong hộp chọn, không thay thế validation phía client/server.
 
 Không dùng `FormField` để tạo form state thứ hai. Khi cần một loại control mới, dùng nó để giữ cách hiển thị label/lỗi thống nhất; `FormField` là phần nội bộ, các trang nên dùng `Form*` cụ thể.

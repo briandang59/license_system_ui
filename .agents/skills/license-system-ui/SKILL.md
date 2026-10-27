@@ -6,7 +6,7 @@ description: Phát triển hoặc sửa tính năng trong repository license-sys
 # Phát triển license-system-ui
 
 Toàn bộ UI admin/public và nội dung trợ năng phải bằng tiếng Việt theo AGENTS.md.
-Dùng locale tiếng Việt của Ant Design/Zod và vi-VN cho số/tiền. Giữ code, route,
+Dùng locale tiếng Việt của Ant Design/Zod. Số/tiền dùng dấu phẩy phân cách hàng nghìn (20,000,000); ngày giờ dùng DatePicker/Dayjs theo Asia/Ho_Chi_Minh, định dạng DD/MM/YYYY HH:mm. ISO có offset chỉ dùng tại API/import/export theo AGENTS.md. Giữ code, route,
 API, enum request và dữ liệu người dùng nguyên vẹn; chỉ dịch nhãn hiển thị.
 
 Skill nằm tại `.agents/skills/license-system-ui/` trong repository. Xác định repo root qua `AGENTS.md` và `package.json`; đọc [AGENTS.md](../../../AGENTS.md) để lấy rules chung. Không áp dụng cấu trúc này sang repo khác chỉ vì cùng dùng Next.js.

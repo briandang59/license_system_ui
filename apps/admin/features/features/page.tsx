@@ -34,6 +34,7 @@ export default function FeaturesPage() {
     mode: "create" | "edit" | "view";
     id?: number;
   } | null>(null);
+  const [formPending, setFormPending] = useState(false);
   const features = useQuery({
     queryKey: ["features", "list", offset, search],
     queryFn: ({ signal }) => featureService.getAll(offset, signal, search),
@@ -152,12 +153,14 @@ export default function FeaturesPage() {
               : "Chi tiết tính năng"
         }
         open={!!dialog}
-        onCancel={() => setDialog(null)}
+        width={720}
+        closable={!formPending} keyboard={!formPending} mask={{ closable: !formPending }}
+        onCancel={() => { if (!formPending) setDialog(null); }}
         footer={null}
         destroyOnHidden
       >
         {dialog?.mode === "create" ? (
-          <FeatureForm onSaved={() => setDialog(null)} />
+          <FeatureForm onPendingChange={setFormPending} onSaved={() => setDialog(null)} />
         ) : detail.isPending ? (
           <Spin aria-label="Đang tải tính năng" />
         ) : detail.isError ? (
@@ -176,6 +179,7 @@ export default function FeaturesPage() {
             <FeatureForm
               key={detail.data.id}
               feature={detail.data}
+              onPendingChange={setFormPending}
               onSaved={() => setDialog(null)}
             />
           ) : (

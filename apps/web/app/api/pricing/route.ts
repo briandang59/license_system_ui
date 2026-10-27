@@ -1,1 +1,5 @@
-export { handlePricing as GET } from "@/features/pricing/handler";
+import { handlePricing } from "@/features/pricing/handler";
+
+export async function GET(request: Request) {
+  return handlePricing(request);
+}

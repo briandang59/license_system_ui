@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import ts from "typescript";
+import { z } from "zod";
 
 const require = createRequire(import.meta.url);
 function load(path, imports = {}) {
@@ -153,6 +154,7 @@ for (const [name, plural] of domains) {
   test(`${name}: form sends nullable clears, keeps immutable plan fields out of PATCH, and blocks pending submits`, async () => {
     const calls = [];
     const formData = { ...input, status: "active", ...(name === "company" ? { tax_code: "", email: "", phone: "" } : { description: "" }),
+      prices: [],
       ...(name === "feature" ? { feature_type: "quantity", unit: "" } : {}),
     };
     let mutation;
@@ -162,7 +164,12 @@ for (const [name, plural] of domains) {
         success: (message) => calls.push(["success", message]),
         error: (message) => calls.push(["error", message]),
       } }) }, Button: "button" },
-      "react-hook-form": { useForm: () => ({ control: {}, handleSubmit: (callback) => () => callback(formData) }) },
+      react: { useState: initial => [initial, () => {}], useEffect: () => {} },
+      "react-hook-form": { FormProvider: "form-provider", useForm: () => ({ control: {}, setValue: () => {}, handleSubmit: (callback) => () => callback(formData) }) },
+      "@/features/pricing/price-entry": { default: "price-entry",
+        priceEntriesSchema: z.array(z.unknown()),
+        saveWithPrices: async ({ saveParent, onParentSaved }) => { const parent = await saveParent(); onParentSaved(parent.id); },
+      },
       "@hookform/resolvers/zod": { zodResolver: () => {} },
       "@tanstack/react-query": {
         useQueryClient: () => ({ invalidateQueries: async (key) => calls.push(["invalidate", key]) }),
@@ -174,15 +181,16 @@ for (const [name, plural] of domains) {
       "@/lib/api-errors": { getApiErrorMessage: () => "Request failed" },
       [`@/features/${plural}/schema`]: schemas,
       [`@/features/${plural}/service`]: { [`${name}Service`]: {
-        create: async (data) => calls.push(["create", data]),
-        update: async (id, data) => calls.push(["update", id, data]),
+        create: async (data) => { calls.push(["create", data]); return record; },
+        update: async (id, data) => { calls.push(["update", id, data]); return record; },
       } },
     };
     for (const control of ["input", "select", "textarea"]) imports[`@/components/form/form-${control}`] = { default: control };
     imports["@/features/products/product-select"] = { default: "product-select" };
     const Form = load(`features/${plural}/form.tsx`, imports)[`${cap}Form`];
     let saved = 0;
-    const form = Form({ [name]: record, onSaved: () => saved++ });
+    const container = Form({ [name]: record, onSaved: () => saved++ });
+    const form = name === "company" ? container : container.props.children;
     form.props.onSubmit();
     assert.equal(calls[0][0], "submit");
     await mutation.mutationFn(formData);
@@ -197,14 +205,16 @@ for (const [name, plural] of domains) {
     }
     if (name === "feature") assert.equal("unit" in payload, false, "Editing a feature must preserve independent legacy unit text");
     await mutation.onSuccess();
+    if (mutation.onSettled) await mutation.onSettled();
     assert.equal(saved, 1);
     const entityLabel = { company: "doanh nghiệp", plan: "gói dịch vụ", feature: "tính năng" }[name];
     assert.ok(calls.some((call) => call[0] === "success" && call[1] === `Đã cập nhật ${entityLabel}.`));
-    assert.deepEqual(calls.at(-1), ["invalidate", { queryKey: [plural] }]);
+    assert.ok(calls.some(call => call[0] === "invalidate" && JSON.stringify(call[1]) === JSON.stringify({ queryKey: [plural] })));
     mutation.onError(new Error("secret backend detail"));
     assert.deepEqual(calls.at(-1), ["error", "Request failed"]);
     pending = true;
-    const blocked = Form({ onSaved: () => saved++ });
+    const blockedContainer = Form({ onSaved: () => saved++ });
+    const blocked = name === "company" ? blockedContainer : blockedContainer.props.children;
     const count = calls.length;
     blocked.props.onSubmit();
     assert.equal(calls.length, count);

@@ -1,4 +1,5 @@
 "use client";
+import { formatNumber } from "@/utils/functions/formatNumber";
 import { displayLabel } from "@/lib/display-labels";
 import { Alert, Button } from "antd";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -17,5 +18,5 @@ export default function PriceSelect<T extends FieldValues>({ kind, parent, start
     const at = Date.parse(startDate);
     const cycle = interval === "monthly" ? "month" : interval === "yearly" ? "year" : interval;
     const rows = (prices.data?.pages.flatMap(p => p.items) ?? []).filter(p => p.status === "active" && Date.parse(p.effective_from) <= at && (!p.effective_to || at < Date.parse(p.effective_to)) && (!currency || p.currency === currency) && (!cycle || p.billing_interval === cycle));
-    return <><FormSelect {...props} disabled={props.disabled || !parent} loading={prices.isFetching} options={rows.map(p => ({ value: p.id, label: `${p.amount_minor} ${p.currency} đơn vị nhỏ nhất / ${displayLabel(p.billing_interval)}` }))}/>{prices.isError && <Alert type="error" title="Không thể tải bảng giá" action={<Button onClick={() => void prices.refetch()}>Thử lại</Button>}/>} {prices.hasNextPage && <Button disabled={props.disabled} loading={prices.isFetchingNextPage} onClick={() => void prices.fetchNextPage()}>Tải thêm giá</Button>}</>;
+    return <><FormSelect {...props} disabled={props.disabled || !parent} loading={prices.isFetching} options={rows.map(p => ({ value: p.id, label: `${formatNumber(p.amount_minor)} ${p.currency} đơn vị nhỏ nhất / ${displayLabel(p.billing_interval)}` }))}/>{prices.isError && <Alert type="error" title="Không thể tải bảng giá" action={<Button onClick={() => void prices.refetch()}>Thử lại</Button>}/>} {prices.hasNextPage && <Button disabled={props.disabled} loading={prices.isFetchingNextPage} onClick={() => void prices.fetchNextPage()}>Tải thêm giá</Button>}</>;
 }

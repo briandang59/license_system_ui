@@ -3,12 +3,12 @@ export function formatMoney(amountMinor: number, currency: string) {
         return "Chưa có giá";
     try {
         if (!Intl.supportedValuesOf("currency").includes(currency))
-            return `${amountMinor} ${currency} đơn vị nhỏ nhất`;
-        const format = new Intl.NumberFormat("vi-VN", { style: "currency", currency });
+            return `${amountMinor.toLocaleString("en-US")} ${currency} đơn vị nhỏ nhất`;
+        const format = new Intl.NumberFormat("en-US", { style: "currency", currency, currencyDisplay: "code" });
         const digits = format.resolvedOptions().maximumFractionDigits ?? 2;
         return format.format(amountMinor / 10 ** digits);
     }
     catch {
-        return `${amountMinor} ${currency} đơn vị nhỏ nhất`;
+        return `${amountMinor.toLocaleString("en-US")} ${currency} đơn vị nhỏ nhất`;
     }
 }

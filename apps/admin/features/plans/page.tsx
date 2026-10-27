@@ -37,6 +37,7 @@ export default function PlansPage() {
     mode: "create" | "edit" | "view";
     id?: number;
   } | null>(null);
+  const [formPending, setFormPending] = useState(false);
   const plans = useQuery({
     queryKey: ["plans", "list", offset, search],
     queryFn: ({ signal }) => planService.getAll(offset, signal, search),
@@ -161,13 +162,14 @@ export default function PlansPage() {
               : "Chi tiết gói dịch vụ"
         }
         open={!!dialog}
-        width={dialog?.mode === "view" ? 960 : 560}
-        onCancel={() => setDialog(null)}
+        width={dialog?.mode === "view" ? 960 : 720}
+        closable={!formPending} keyboard={!formPending} mask={{ closable: !formPending }}
+        onCancel={() => { if (!formPending) setDialog(null); }}
         footer={null}
         destroyOnHidden
       >
         {dialog?.mode === "create" ? (
-          <PlanForm onSaved={() => setDialog(null)} />
+          <PlanForm onPendingChange={setFormPending} onSaved={() => setDialog(null)} />
         ) : detail.isPending ? (
           <Spin aria-label="Đang tải gói dịch vụ" />
         ) : detail.isError ? (
@@ -186,6 +188,7 @@ export default function PlansPage() {
             <PlanForm
               key={detail.data.id}
               plan={detail.data}
+              onPendingChange={setFormPending}
               onSaved={() => setDialog(null)}
             />
           ) : (

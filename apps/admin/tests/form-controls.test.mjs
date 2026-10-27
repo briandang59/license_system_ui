@@ -9,6 +9,7 @@ const { createElement } = require("react");
 const { renderToStaticMarkup } = require("react-dom/server");
 const { useForm } = require("react-hook-form");
 const dayjs = require("dayjs");
+const { FormProvider } = require("react-hook-form");
 
 function load(path, imports = {}) {
   const source = ts.transpileModule(readFileSync(path, "utf8"), {
@@ -16,10 +17,32 @@ function load(path, imports = {}) {
   }).outputText;
   const compiled = { exports: {} };
   new Function("require", "module", "exports", source)(
-    (name) => imports[name] ?? (name === "@/lib/display-labels" ? load("lib/display-labels.ts") : require(name)), compiled, compiled.exports,
+    (name) => imports[name] ?? (name.startsWith("@/utils/functions/") ? load(`${name.slice(2)}.ts`) : name === "@/lib/display-labels" ? load("lib/display-labels.ts") : require(name)), compiled, compiled.exports,
   );
   return compiled.exports;
 }
+
+test("inline pricing renders parent form values with accessible dates, zero amount and pending controls", () => {
+  const FormField = load("components/form/form-field.tsx");
+  const imports = { "./entry-schema": {}, "./save-with-prices": {} };
+  for (const name of ["input", "input-number", "select", "date-picker"]) {
+    imports[`@/components/form/form-${name}`] = load(`components/form/form-${name}.tsx`, { "./form-field": FormField });
+  }
+  const Entry = load("features/pricing/price-entry.tsx", imports).default;
+  function Example() {
+    const form = useForm({ defaultValues: { prices: [{ amount_minor: 0, currency: "VND", billing_interval: "month", status: "active", effective_from: load("utils/functions/formatDateTime.ts").parseDateTime("2026-10-27T09:00:00+07:00"), effective_to: null }] } });
+    return createElement(FormProvider, form, createElement(Entry, { disabled: true, existing: false }));
+  }
+  const html = renderToStaticMarkup(createElement(Example));
+  assert.match(html, /Giá bán/);
+  assert.match(html, /value="0"/);
+  assert.match(html, /value="VND"/);
+  assert.match(html, /giờ Việt Nam/);
+  assert.match(html, /value="27\/10\/2026 09:00"/);
+  assert.match(html, /aria-label="Bỏ dòng giá 1"/);
+  assert.match(html, /<fieldset[^>]*disabled/);
+  assert.doesNotMatch(html, /<form/);
+});
 
 test("form controls preserve values and bind change, blur, disabled and accessible errors", () => {
   const date = dayjs("2026-10-16");
