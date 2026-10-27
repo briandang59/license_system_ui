@@ -4,7 +4,7 @@ import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Avatar, Button, Drawer, Menu } from "antd";
-import { Building2, ChevronRight, Layers3, LayoutDashboard, LogOut, Menu as MenuIcon, Package, Puzzle, ShieldCheck } from "lucide-react";
+import { Building2, CalendarCheck, ChevronRight, Layers3, LayoutDashboard, LogOut, Menu as MenuIcon, Package, Puzzle, Ruler, ShieldCheck } from "lucide-react";
 import ThemeSwitcher from "@/components/ui/theme-switcher";
 import { useLogout } from "@/features/auth/use-logout";
 
@@ -15,13 +15,12 @@ const items = [
     label: "Catalogs",
     type: "group" as const,
     children: [
-      { key: "licenses", icon: <ShieldCheck size={17} aria-hidden="true" />, label: "Licenses", disabled: false },
+      { key: "/licenses", icon: <ShieldCheck size={17} aria-hidden="true" />, label: <Link href="/licenses">Licenses</Link> },
       { key: "/products", icon: <Package size={17} aria-hidden="true" />, label: <Link href="/products">Products</Link> },
       { key: "/companies", icon: <Building2 size={17} aria-hidden="true" />, label: <Link href="/companies">Companies</Link> },
       { key: "/plans", icon: <Layers3 size={17} aria-hidden="true" />, label: <Link href="/plans">Plans</Link> },
-      { key: "/data-transfer", label: <Link href="/data-transfer">Import & export</Link> },
-      { key: "/units", label: <Link href="/units">Units</Link> },
-      { key: "/subscriptions", label: <Link href="/subscriptions">Subscriptions</Link> },
+      { key: "/units", icon: <Ruler size={17} aria-hidden="true" />, label: <Link href="/units">Units</Link> },
+      { key: "/subscriptions", icon: <CalendarCheck size={17} aria-hidden="true" />, label: <Link href="/subscriptions">Subscriptions</Link> },
       { key: "/features", icon: <Puzzle size={17} aria-hidden="true" />, label: <Link href="/features">Features</Link> },
     ],
   },

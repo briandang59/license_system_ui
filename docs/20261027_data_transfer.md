@@ -5,8 +5,8 @@ giá, không import Subscription/License/log; export CSV cho mọi nhóm nghiệ
 
 ## Cách dùng
 
-Mở admin → Import & export, chọn resource; hoặc dùng Import/Export CSV trên màn hình
-catalog. View Plan/Feature có các thao tác cho bảng giá; modal Plan Features có
+Dùng Import/Export CSV ngay trên màn hình catalog, không có trang import/export riêng.
+View Plan/Feature có các thao tác cho bảng giá; modal Plan Features có
 import/export liên kết. Subscription và custom add-on chỉ có Export CSV.
 
 1. Tải CSV template hoặc Excel template.
@@ -16,8 +16,8 @@ import/export liên kết. Subscription và custom add-on chỉ có Export CSV.
 5. Nếu lỗi, không dòng nào được lưu; Download errors lấy CSV để sửa và kiểm tra lại.
 
 Export lấy toàn bộ kết quả khớp bộ lọc/search hoặc parent đang xem, không chỉ trang
-Table hiện tại. Trang chung xuất mọi nhóm, gồm License/entitlement/activation/log
-metadata. Không có export token/mật khẩu/phiên đăng nhập. Log không xuất raw JSON.
+Table hiện tại. Trang Licenses xuất License/entitlement/activation/log metadata;
+chưa cung cấp CRUD License. Không có export token/mật khẩu/phiên đăng nhập. Log không xuất raw JSON.
 
 ## Quy tắc dữ liệu
 
@@ -48,7 +48,7 @@ lặng lẽ. CSV có BOM, quoting, timestamp UTC, null là ô trống. Chuỗi g
 ## Thiết kế và contract
 
 Feature nằm tại apps/admin/features/data-transfer: schema/urls/service/handler,
-component DataTransferActions và page. Đây là điểm tích hợp component dùng chung
+component DataTransferActions. Đây là điểm tích hợp component dùng chung
 cho các màn hình; không import service/schema nội bộ của catalog khác.
 
 Route /api/data-transfer/[resource]/[action] chỉ chuyển tiếp vào handler server.
