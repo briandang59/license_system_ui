@@ -54,22 +54,22 @@ const find=(node,type)=>!node||typeof node!=="object"?[]:Array.isArray(node)?nod
 const textOf=node=>node==null?"":typeof node==="object"?Array.isArray(node)?node.map(textOf).join(" "):textOf(node.props?.children):String(node);
 
 test("pricing UI shows unpriced plan benefits and comparison; price failures preserve the catalog",()=>{
- let state=["","",""];let cursor=0;let priceError=false;let priceItems=[];
+ let state=[null,"","",""];let cursor=0;let priceError=false;let priceItems=[];
  const Page=load("features/pricing/page.tsx",{
   react:{useState:()=>{const index=cursor++;return [state[index],value=>{state[index]=value}];}},
   antd:{Alert:"alert",Button:"button",Segmented:"segmented",Select:"select"},
   "@tanstack/react-query":{useQuery:options=>options.queryKey[0]==="public-catalog"?{data:[catalogItem,{...catalogItem,owner_id:2,name:"Nâng cao"}]}:{data:priceItems,isError:priceError}},
-  "./service":{publicPricingService:{}},"./presentation":presentation,"./money":{formatMoney},
+  "./service":{publicPricingService:{}},"./presentation":presentation,"./money":{formatMoney},"@/features/registrations/dialog":{default:"registration-dialog"},
  }).default;
  const render=()=>{cursor=0;return Page({});};
  let tree=render();
- assert.equal(find(tree,"article").length,2);
+ assert.equal(find(tree,"article").length,3);assert.match(textOf(tree),/Tùy chỉnh & đăng ký/);
  assert.match(textOf(tree),/Liên hệ tư vấn/);assert.match(textOf(tree),/Camera/);assert.match(textOf(tree),/0 camera/);
  assert.equal(find(tree,"table").length,1);
  assert.match(textOf(tree),/giá chưa công bố không được hiểu là miễn phí/);
- priceError=true;tree=render();assert.equal(find(tree,"article").length,2);assert.match(textOf(tree),/Tạm chưa tải được giá/);
+ priceError=true;tree=render();assert.equal(find(tree,"article").length,3);assert.match(textOf(tree),/Tạm chưa tải được giá/);
  priceError=false;priceItems=[{...catalogItem,price_id:7,amount_minor:0,currency:"VND",billing_interval:"month"}];tree=render();
- assert.match(textOf(tree),/0/);assert.equal(find(tree,"article").length,2);
+ assert.match(textOf(tree),/0/);assert.equal(find(tree,"article").length,3);
 });
 test("public proxy validates upstream shape and shields errors",async()=>{
  global.fetch=async()=>Response.json({success:true,data:{items:[{private:"secret"}],limit:100,offset:0}});
