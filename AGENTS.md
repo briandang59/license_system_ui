@@ -131,3 +131,13 @@ features/
 - Với code thay đổi, chạy `pnpm test`, `pnpm lint`, `pnpm exec tsc --noEmit`; chạy `pnpm build` khi ảnh hưởng routing, providers, cấu hình hoặc ranh giới server/client. Kiểm tra UI trong trình duyệt khi sửa hành vi/layout và có môi trường chạy được.
 - Nếu chỉ sửa tài liệu/skill, kiểm tra nội dung, đường dẫn và skill validator; không cần build ứng dụng.
 - Báo cáo file đã sửa, kết quả kiểm tra và phần chưa kiểm tra/rủi ro thực tế. Không tuyên bố test/build thành công nếu chưa chạy.
+
+## Monorepo web/admin — 20261027
+
+- Hai Next.js app độc lập: `apps/web` (public, brian.com) và `apps/admin` (quản trị, admin.brian.com).
+- Các đường dẫn app/components/features/lib/tests/proxy phía trên tính từ `apps/admin/`.
+  Public app dùng cấu trúc feature tương tự trong `apps/web/`, không import auth/handler admin.
+- Backend public pricing chỉ đọc tại `/api/v1/public/pricing`; không dùng token admin cho website khách hàng.
+- Giữ cookie admin host-only; không đặt Domain=.brian.com. DNS/TLS/reverse proxy cấu hình khi deploy.
+- Chạy lệnh toàn workspace tại root hoặc dùng `pnpm --filter @license/admin` / `@license/web`.
+- App public không có proxy đăng nhập. API_BASE_URL chỉ ở server của từng app.

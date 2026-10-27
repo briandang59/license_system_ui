@@ -1,0 +1,1 @@
+export const subscriptionUrls = { list: "/api/subscriptions", detail: (id: number) => `/api/subscriptions/${id}`, addons: (id: number) => `/api/subscriptions/${id}/features`, addon: (id: number, feature: number) => `/api/subscriptions/${id}/features/${feature}` };

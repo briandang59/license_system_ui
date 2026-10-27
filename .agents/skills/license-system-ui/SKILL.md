@@ -40,3 +40,7 @@ Dùng quy trình kiểm tra trong `AGENTS.md`. Test hiện tại dùng `node:tes
 Với handler/API, chọn test theo rủi ro thay đổi: input/params không hợp lệ không gọi backend, request thiếu phiên hoặc sai origin bị chặn, upstream lỗi/response sai schema được xử lý, `204` không parse JSON. Với auth, kiểm tra cookie và việc không lộ token khi thay đổi flow đó. Với UI, kiểm tra submit pending, lỗi giữ dữ liệu và cập nhật danh sách sau lưu/xóa khi liên quan.
 
 Kết thúc bằng báo cáo ngắn bằng tiếng Việt: hành vi đã đổi, file chính, lệnh đã chạy/kết quả, phần chưa kiểm tra và rủi ro có bằng chứng. Chỉ cập nhật rules/skill khi thay đổi kiến trúc hoặc quy ước trong phạm vi yêu cầu làm chúng không còn đúng.
+
+## Workspace apps (20261027)
+
+App root cho các đường dẫn feature/app/tests phía trên là `apps/admin/`. Website public nằm tại `apps/web/`, không phụ thuộc admin auth. Kiểm tra cả hai app khi thay đổi monorepo; cấu hình build/deploy ở repo root.

@@ -1,87 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# License System frontend
 
-## Cấu trúc mã nguồn
+Hai Next.js app độc lập trong pnpm workspace:
 
-- `app/`: Next.js routes, API route entry, layouts và providers.
-- `features/auth/`: login, logout, schema, service, URL và server handler xác thực.
-- `features/products/`: UI CRUD, schema, service, URL và server handler products.
-- `features/companies/`, `features/plans/`, `features/features/`: CRUD tương ứng tại `/companies`, `/plans`, `/features`, gồm form, columns, descriptions, schema, service, URL và handler. Forms plan/feature dùng bộ chọn product có tải thêm theo trang.
-- `components/`: form controls và layouts dùng chung.
-- `lib/`: HTTP client, response contract và ánh xạ lỗi.
-- `utils/`: helpers độc lập nghiệp vụ dùng chung.
-- `tests/`: tests chạy bằng `node:test`.
+| App | Local | Production ví dụ |
+| --- | --- | --- |
+| apps/web | http://localhost:3000 | https://brian.com |
+| apps/admin | http://localhost:3001 | https://admin.brian.com |
 
-Quy tắc đặt file, chiều phụ thuộc và kiểm tra nằm trong [AGENTS.md](AGENTS.md).
-Hướng dẫn triển khai theo repository nằm trong [skill license-system-ui](.agents/skills/license-system-ui/SKILL.md).
-Code riêng của domain nằm trong feature, kể cả schema/URL được cả client và server dùng. Handler đặt trực tiếp tại `features/<domain>/handler.ts`, ngang hàng với `schema.ts`, `service.ts`, `urls.ts`; không có thư mục `server/`. Handler chỉ chạy phía server và không được import vào client.
+Chạy `pnpm install --frozen-lockfile`, sau đó `pnpm dev:web` và `pnpm dev:admin`
+trong hai terminal. Mỗi app có `.env.example`; API_BASE_URL chỉ dùng server.
+File `.env` local cũ đã chuyển sang apps/admin; nếu APP_ORIGIN còn dùng port 3000,
+cần đổi thành origin admin thực tế (mặc định 3001) trước khi gửi mutation.
 
-Catalog dựa trên Swagger backend `/swagger/openapi.json`: company cho sửa code, plan giữ code/product khi update, feature hỗ trợ loại boolean/quantity/unlimited và unit. Trường tùy chọn xóa trắng trong form được gửi thành `null`. Danh sách phân trang offset, không suy ra total. Các endpoint liên kết plan-feature được tách riêng khỏi CRUD này.
+Admin quản lý Products, Companies, Plans, Features, Units, giá và Subscription/add-on.
+Mở View trên Plan/Feature để quản lý Price history. Web có landing page `/` và
+`/pricing`, lấy giá qua API public, không cần cookie/token admin. SALES_CONTACT_URL
+optional; để trống sẽ ẩn CTA liên hệ. Chưa có checkout/payment/renewal tự động.
 
-Bốn bảng products/companies/plans/features dùng số thứ tự theo offset, checkbox chọn dòng và tìm kiếm phía backend (Enter/nút tìm kiếm; clear để bỏ lọc). ID kỹ thuật không hiển thị ở bảng/chi tiết nhưng vẫn dùng làm khóa nội bộ. View/Edit/Delete dùng icon Lucide có nhãn truy cập; đổi trang/từ khóa hoặc xóa thành công sẽ xóa lựa chọn dòng.
+Kiểm tra cả hai app: `pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm build`.
 
-## Getting Started
+## Kiến trúc và xác thực admin
 
-### Docker
+Trong apps/admin, app/ giữ routes/layout/providers; features/<domain>/ giữ UI,
+schema, service, urls và handler server. components/ chứa form controls/layouts;
+lib/ chứa HTTP/response/error helpers; tests/ dùng node:test. Quy tắc đầy đủ tại
+[AGENTS.md](AGENTS.md) và [skill repository](.agents/skills/license-system-ui/SKILL.md).
 
-Build và chạy UI production bằng Docker Compose (Linux containers):
+Luồng browser → feature service → API route same-origin → feature handler → backend.
+Không import handler vào client. Catalog phân trang offset, không suy ra total;
+giữ quyền PATCH riêng theo Swagger. Plan Features có endpoint riêng. ID kỹ thuật
+dùng nội bộ; bảng hiển thị số thứ tự, selection và actions có accessible labels.
 
-```bash
-docker compose up -d --build
-```
+Admin `/auth/login` gửi tới `/api/auth/login`. Server lưu access_token và
+license_refresh bằng HttpOnly cookies, không trả token cho JavaScript. proxy.ts
+chỉ redirect theo sự hiện diện cookie; backend xác minh token. Refresh tường minh,
+không tự retry khi 401. Logout thành công thu hồi phiên, xóa cookies/cache;
+lỗi logout giữ phiên để thử lại. Production dùng HTTPS vì cookies có cờ Secure.
 
-Mở `http://localhost:3000`. Xem log bằng `docker compose logs -f ui`; dừng bằng `docker compose down`.
+## Deploy độc lập
 
-Compose mặc định gọi backend trên máy host tại `http://host.docker.internal:5000/api/v1`. `localhost` bên trong container là chính container, không phải máy host. Backend cần lắng nghe trên interface mà container truy cập được. Nếu backend ở máy khác hoặc container cùng network, đặt `DOCKER_API_BASE_URL` thành URL phù hợp.
+`docker compose build admin web` tạo hai image; `docker compose up -d admin web`
+chỉ chạy khi đã được phép triển khai. Docker argument APP chọn admin/web và dùng
+standalone output riêng. Compose config dùng `.env.example` tại root.
 
-Có thể đặt `DOCKER_API_BASE_URL` và `UI_PORT` trong file `.env` tại repo root (xem `.env.example`). Các giá trị này được Compose truyền lúc chạy; file `.env*` thực tế không được đưa vào image. `API_BASE_URL` vẫn dành cho chạy ứng dụng trực tiếp ngoài Docker. Sau khi đổi cấu hình, chạy lại `docker compose up -d`.
+Nếu đang chạy service `ui` của cấu hình Compose cũ, cần dừng service/container cũ
+trong lần chuyển đổi trước khi dùng port 3000 cho web. Không chạy đồng thời hai
+container cùng chiếm port này; cấu hình mới không tự dừng service cũ.
 
-Image dùng Next.js standalone, chạy bằng user `node`, bao gồm `public` và `.next/static`. Khi triển khai qua domain, dùng HTTPS/reverse proxy vì cookie xác thực production có cờ `Secure`; proxy cần giữ đúng host/origin để request thay đổi dữ liệu vượt qua kiểm tra same-origin.
+DNS A/CNAME của domain chính và subdomain admin trỏ reverse proxy. Proxy đưa
+brian.com vào web:3000 và admin.brian.com vào admin:3000, bật TLS cho cả hai.
+Đặt ADMIN_ORIGIN=https://admin.brian.com và API_BASE_URL tới backend nội bộ.
+Cookies admin host-only; không chia sẻ sang website public.
 
-`APP_ORIGIN` là origin công khai của UI để kiểm tra request thay đổi dữ liệu, vì request URL trong standalone có thể dùng hostname nội bộ. Compose mặc định dùng `http://localhost:3000` (theo `UI_PORT`). Nếu truy cập qua IP/domain khác, đặt `APP_ORIGIN` đúng scheme, host và port trên trình duyệt, không có dấu `/` cuối, rồi chạy `docker compose up -d`. Ví dụ: `APP_ORIGIN=https://license.example.com`. Không đặt thành URL backend.
+Trong Docker, localhost là container hiện tại; host.docker.internal dành cho
+backend trên host. Cấu hình APP_ORIGIN phải khớp scheme/host/port công khai, không
+có dấu `/` cuối. Backend cần lắng nghe interface mà container truy cập được.
 
-### Authentication
-
-Visit `/auth/login` for the React Hook Form + Zod login form. TanStack Query manages the login request state.
-
-The browser posts to `/api/auth/login`. This Next.js route calls `POST http://localhost:5000/api/v1/auth/login` and stores the returned access token in an HttpOnly cookie for `expires_in` seconds. The token is not returned to browser JavaScript.
-
-To change the backend address, copy `.env.example` to `.env.local` and set `API_BASE_URL`. Restart the app after changing it.
-
-Login redirects to `/`. The Next.js `proxy.ts` redirects page requests without an access-token cookie to `/auth/login`, and redirects visitors with that cookie away from the login page. This is an optimistic navigation check, not token verification. Backend APIs must still verify tokens and permissions.
-
-`authService` exposes `login`, `register` (email, password, invite_token), `logout`, `me`, and `refresh`. Same-origin server routes forward Bearer authentication and the refresh cookie to the backend. Login/register/refresh store tokens in HttpOnly cookies; refresh tokens are never returned to browser JavaScript. Refresh is explicit, not automatically retried on 401 responses. The header's Sign out button revokes the backend session, clears both cookies and the query cache, and redirects to login. Backend failures keep the session in place and display an error so sign-out can be retried.
-
-Run `pnpm test`, `pnpm lint`, and `pnpm build` to check the implementation.
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-Sửa màn hình trong `features/auth/login-page.tsx` hoặc `features/products/page.tsx`; các file `app/**/page.tsx` tương ứng chỉ nối route tới feature. Trang overview nằm tại `app/(dashboard)/page.tsx`.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Thiết kế, contract và evidence: [public pricing — 20261027](docs/20261027_public_pricing.md).

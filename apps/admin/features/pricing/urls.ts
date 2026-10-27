@@ -1,0 +1,1 @@
+export const priceUrls = { list: (kind: "plans" | "features", parentId: number) => `/api/${kind}/${parentId}/prices`, detail: (kind: "plans" | "features", parentId: number, id: number) => `/api/${kind}/${parentId}/prices/${id}` };

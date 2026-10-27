@@ -1,12 +1,29 @@
 services:
-  ui:
-    image: license-system-ui:local
-    build: .
+  admin:
+    image: license-system-admin:local
+    build:
+      context: .
+      args:
+        APP: admin
     ports:
-      - "${UI_PORT:-3000}:3000"
+      - "${ADMIN_PORT:-3001}:3000"
     environment:
-      APP_ORIGIN: ${APP_ORIGIN:-http://localhost:${UI_PORT:-3000}}
+      APP_ORIGIN: ${ADMIN_ORIGIN:-http://localhost:3001}
       API_BASE_URL: ${DOCKER_API_BASE_URL:-http://host.docker.internal:5000/api/v1}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+  web:
+    image: license-system-web:local
+    build:
+      context: .
+      args:
+        APP: web
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    environment:
+      API_BASE_URL: ${DOCKER_API_BASE_URL:-http://host.docker.internal:5000/api/v1}
+      SALES_CONTACT_URL: ${SALES_CONTACT_URL:-}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
