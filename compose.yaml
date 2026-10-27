@@ -22,6 +22,7 @@ services:
     ports:
       - "${WEB_PORT:-3000}:3000"
     environment:
+      APP_ORIGIN: ${WEB_ORIGIN:-http://localhost:3000}
       API_BASE_URL: ${DOCKER_API_BASE_URL:-http://host.docker.internal:5000/api/v1}
       SALES_CONTACT_URL: ${SALES_CONTACT_URL:-}
     extra_hosts:

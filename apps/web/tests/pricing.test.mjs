@@ -54,22 +54,41 @@ const find=(node,type)=>!node||typeof node!=="object"?[]:Array.isArray(node)?nod
 const textOf=node=>node==null?"":typeof node==="object"?Array.isArray(node)?node.map(textOf).join(" "):textOf(node.props?.children):String(node);
 
 test("pricing UI shows unpriced plan benefits and comparison; price failures preserve the catalog",()=>{
- let state=[null,"","",""];let cursor=0;let priceError=false;let priceItems=[];
+ let state=["","",""];let cursor=0;let priceError=false;let priceItems=[];
  const Page=load("features/pricing/page.tsx",{
   react:{useState:()=>{const index=cursor++;return [state[index],value=>{state[index]=value}];}},
   antd:{Alert:"alert",Button:"button",Segmented:"segmented",Select:"select"},
   "@tanstack/react-query":{useQuery:options=>options.queryKey[0]==="public-catalog"?{data:[catalogItem,{...catalogItem,owner_id:2,name:"Nâng cao"}]}:{data:priceItems,isError:priceError}},
-  "./service":{publicPricingService:{}},"./presentation":presentation,"./money":{formatMoney},"@/features/registrations/dialog":{default:"registration-dialog"},
+  "./service":{publicPricingService:{}},"./presentation":presentation,"./money":{formatMoney},
  }).default;
  const render=()=>{cursor=0;return Page({});};
  let tree=render();
  assert.equal(find(tree,"article").length,3);assert.match(textOf(tree),/Tùy chỉnh & đăng ký/);
+ const links=find(tree,require("next/link").default).map(link=>link.props.href);
+ assert.ok(links.includes("/register?product=4&currency=VND&interval=month&plan=1"));
+ assert.ok(links.includes("/register?product=4&currency=VND&interval=month"));
  assert.match(textOf(tree),/Liên hệ tư vấn/);assert.match(textOf(tree),/Camera/);assert.match(textOf(tree),/0 camera/);
  assert.equal(find(tree,"table").length,1);
  assert.match(textOf(tree),/giá chưa công bố không được hiểu là miễn phí/);
  priceError=true;tree=render();assert.equal(find(tree,"article").length,3);assert.match(textOf(tree),/Tạm chưa tải được giá/);
  priceError=false;priceItems=[{...catalogItem,price_id:7,amount_minor:0,currency:"VND",billing_interval:"month"}];tree=render();
  assert.match(textOf(tree),/0/);assert.equal(find(tree,"article").length,3);
+});
+test("registration page preserves selected plan and matching price and rejects missing plans",()=>{
+ const feature={...catalogItem,kind:"feature",owner_id:8,name:"Camera bổ sung",feature_type:"quantity",benefits:[]};
+ const price={...catalogItem,price_id:7,amount_minor:100,currency:"USD",billing_interval:"year",effective_from:"2026-01-01",effective_to:null};
+ let pricingError=false;
+ const Catalog=load("features/pricing/registration-catalog.tsx",{
+  "@/features/registrations/form":{default:"registration-form"},
+  "@tanstack/react-query":{useQuery:options=>options.queryKey[0]==="public-catalog"?{data:[catalogItem,feature],isPending:false}:{data:pricingError?undefined:[price],isPending:false,isError:pricingError}},
+  "./service":{publicPricingService:{}},"./presentation":presentation,
+ }).default;
+ const selected=Catalog({product:"4",plan:"1",currency:"USD",interval:"year"});
+ assert.equal(selected.type,"registration-form");
+ assert.equal(selected.props.selection.planID,1);assert.equal(selected.props.selection.plans[0].priceID,7);
+ assert.equal(selected.props.selection.features[0].id,8);
+ const missing=Catalog({product:"4",plan:"999"});assert.equal(find(missing,"registration-form").length,0);
+ pricingError=true;const fallback=Catalog({product:"4",plan:"1"});assert.equal(fallback.props.selection.priceUnavailable,true);assert.equal(fallback.props.selection.plans[0].priceID,null);
 });
 test("public proxy validates upstream shape and shields errors",async()=>{
  global.fetch=async()=>Response.json({success:true,data:{items:[{private:"secret"}],limit:100,offset:0}});

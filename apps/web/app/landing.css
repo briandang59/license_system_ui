@@ -68,9 +68,14 @@ html { scroll-behavior: smooth; scroll-padding-top: 32px; }
 .benefit-list li { display: flex; align-items: start; gap: 9px; font-size: 13px; line-height: 1.6; }
 .benefit-list svg { flex-shrink: 0; color: var(--positive); margin-top: 3px; }
 .benefit-list small { display: block; color: var(--muted); font-size: 11px; }
-.offer-action { margin-top: auto; padding-top: 8px; }
+.offer-action { margin-top: auto; padding-top: 16px; display: flex; flex-direction: column; gap: 8px; }
 .offer-action a { display: flex; justify-content: center; align-items: center; gap: 10px; padding: 11px 14px; background: var(--accent-soft); color: var(--accent); border: 1px solid var(--line); border-radius: 6px; font-size: 13px; font-weight: 550; transition: background .2s; }
 .offer-action a:hover { background: var(--surface-subtle); }
+.offer-action a.offer-register, .custom-offer-link { display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 6px; background: var(--accent); color: var(--canvas); font-size: 13px; font-weight: 600; text-decoration: none; }
+.offer-action a.offer-register:hover, .custom-offer-link:hover { background: var(--accent); opacity: .88; }
+.custom-offer { margin-top: 24px; flex-direction: row; align-items: center; justify-content: space-between; gap: 24px; }
+.custom-offer p { margin-top: 8px; color: var(--muted); }
+@media (max-width: 600px) { .custom-offer { align-items: stretch; flex-direction: column; } }
 .offer-action > p { color: var(--muted); font-size: 12px; line-height: 1.6; }
 .empty-benefits { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 28px; }
 .pricing-status { border: 1px solid var(--line); padding: 36px; background: var(--surface); border-radius: 12px; color: var(--muted); line-height: 1.8; }

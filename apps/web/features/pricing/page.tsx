@@ -1,6 +1,6 @@
 "use client";
 
-import RegistrationDialog, { type RegistrationSelection } from "@/features/registrations/dialog";
+import Link from "next/link";
 import { useState } from "react";
 import { Alert, Button, Segmented, Select } from "antd";
 import { ArrowUpRight, Check, Info, Layers3, Package } from "lucide-react";
@@ -13,7 +13,6 @@ import type { CatalogItem } from "./schema";
 const periods = { month: "/ tháng", year: "/ năm", one_time: "một lần" };
 
 export default function PricingPage({ contactUrl }: { contactUrl?: string }) {
-  const [registration, setRegistration] = useState<RegistrationSelection | null>(null);
   const [product, setProduct] = useState("");
   const [currency, setCurrency] = useState("");
   const [interval, setInterval] = useState("");
@@ -36,10 +35,10 @@ export default function PricingPage({ contactUrl }: { contactUrl?: string }) {
   const comparisons = [...new Map(plans.flatMap(plan => plan.benefits).map(benefit => [benefitKey(benefit), benefit])).values()];
   const loading = catalog.isPending && pricing.isPending;
 
-  function register(planID: number | null) {
-    setRegistration({ product: { id: Number(selectedProduct), name: products.find(([id]) => id === selectedProduct)?.[1] ?? "" }, planID,
-      plans: plans.map(p => ({ id: p.owner_id, name: p.name, priceID: matchingPrice(p, offers, selectedCurrency, selectedInterval)?.price_id ?? null })),
-      features: features.map(f => ({ id: f.owner_id, name: f.name, type: f.feature_type ?? "boolean" })) });
+  function registrationUrl(planID: number | null) {
+    const params = new URLSearchParams({ product: selectedProduct, currency: selectedCurrency, interval: selectedInterval });
+    if (planID !== null) params.set("plan", String(planID));
+    return `/register?${params}`;
   }
   function planCard(plan: CatalogItem) {
     const price = matchingPrice(plan, offers, selectedCurrency, selectedInterval);
@@ -53,7 +52,7 @@ export default function PricingPage({ contactUrl }: { contactUrl?: string }) {
       <div className="benefit-title"><Layers3 size={15} aria-hidden /> Quyền lợi trong gói</div>
       {plan.benefits.length ? <ul className="benefit-list">{plan.benefits.map((benefit,index) => <li key={`${benefitKey(benefit)}-${index}`}><Check size={15} aria-hidden /><div>{benefit.name}{benefit.feature_type !== "boolean" && <small>{benefitLimit(benefit)}</small>}</div></li>)}</ul>
         : <p className="empty-benefits">Quyền lợi của gói đang được cập nhật.</p>}
-      <div className="offer-action"><Button type="primary" onClick={() => register(plan.owner_id)}>Đăng ký / Tùy chỉnh</Button>{contactUrl ? <a href={contactUrl}>Tư vấn gói {plan.name}<ArrowUpRight size={15} aria-hidden /></a> : <a href="#comparison">So sánh quyền lợi<ArrowUpRight size={15} aria-hidden /></a>}</div>
+      <div className="offer-action"><Link className="offer-register" href={registrationUrl(plan.owner_id)}>Đăng ký / Tùy chỉnh</Link>{contactUrl ? <a href={contactUrl}>Tư vấn gói {plan.name}<ArrowUpRight size={15} aria-hidden /></a> : <a href="#comparison">So sánh quyền lợi<ArrowUpRight size={15} aria-hidden /></a>}</div>
     </article>;
   }
 
@@ -75,8 +74,7 @@ export default function PricingPage({ contactUrl }: { contactUrl?: string }) {
       const price = matchingPrice(feature,offers,selectedCurrency,selectedInterval);
       return <article className="addon" key={feature.owner_id}><h4>{feature.name}</h4>{feature.description && <p>{feature.description}</p>}<p className="addon-price">{price ? formatMoney(price.amount_minor,price.currency) : pricing.isPending ? "Đang tải giá..." : pricing.isError ? "Tạm chưa tải được giá" : "Liên hệ tư vấn"}</p>{price && <p>{periods[price.billing_interval]}{feature.feature_type === "quantity" ? ` · Theo ${feature.unit || "đơn vị mua"}` : ""}</p>}</article>;
     })}</div></section>}
-    {!!products.length && <article className="offer" style={{ marginTop: 24 }}><h3>Gói tùy chỉnh</h3><p>Chọn tính năng, hạn mức và gửi nhu cầu để nhận báo giá riêng cho doanh nghiệp.</p><Button type="primary" onClick={() => register(null)}>Tùy chỉnh & đăng ký</Button></article>}
-    {registration && <RegistrationDialog selection={registration} onClose={() => setRegistration(null)} />}
+    {!!products.length && <article className="offer custom-offer"><div><h3>Gói tùy chỉnh</h3><p>Chọn tính năng, hạn mức và gửi nhu cầu để nhận báo giá riêng cho doanh nghiệp.</p></div><Link className="custom-offer-link" href={registrationUrl(null)}>Tùy chỉnh & đăng ký</Link></article>}
     <section id="comparison" className="comparison-section" aria-label="So sánh tính năng"><h3>Khác biệt nằm ở quyền lợi.</h3><p className="section-subtitle">Đối chiếu tính năng và hạn mức để chọn gói phù hợp với quy mô vận hành.</p>
       {plans.length && comparisons.length ? <div className="comparison-scroll" tabIndex={0} role="region" aria-label="Bảng so sánh quyền lợi có thể cuộn"><table className="comparison-table"><caption>Quyền lợi của các gói thuộc sản phẩm đang chọn</caption><thead><tr><th scope="col">Tính năng</th>{plans.map(plan => <th scope="col" key={plan.owner_id}>{plan.name}</th>)}</tr></thead><tbody>{comparisons.map(benefit => <tr key={benefitKey(benefit)}><th scope="row">{benefit.name}</th>{plans.map(plan => {const included=plan.benefits.find(item => benefitKey(item) === benefitKey(benefit));return <td key={plan.owner_id}>{included ? included.feature_type === "boolean" ? <><Check size={16} aria-hidden /> Đã bao gồm</> : benefitLimit(included) : <span className="muted">Không bao gồm</span>}</td>;})}</tr>)}</tbody></table></div>
         : <p className="pricing-status">Bảng so sánh sẽ xuất hiện khi các gói có quyền lợi được công bố.</p>}

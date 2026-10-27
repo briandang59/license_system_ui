@@ -67,7 +67,7 @@ container cùng chiếm port này; cấu hình mới không tự dừng service 
 
 DNS A/CNAME của domain chính và subdomain admin trỏ reverse proxy. Proxy đưa
 brian.com vào web:3000 và admin.brian.com vào admin:3000, bật TLS cho cả hai.
-Đặt ADMIN_ORIGIN=https://admin.brian.com và API_BASE_URL tới backend nội bộ.
+Đặt ADMIN_ORIGIN=https://admin.brian.com, WEB_ORIGIN=https://brianense.id.vn và API_BASE_URL tới backend nội bộ. WEB_ORIGIN phải khớp chính xác scheme, host và port trên trình duyệt, không có dấu `/` cuối; với Docker local mặc định là http://localhost:3000. Sau khi đổi origin, tạo lại container web để áp dụng cấu hình.
 Cookies admin host-only; không chia sẻ sang website public.
 
 Trong Docker, localhost là container hiện tại; host.docker.internal dành cho
