@@ -14,8 +14,8 @@ export default function FeatureContext({ id, children }: {
     if (!id)
         return null;
     if (query.isPending)
-        return <Spin aria-label="Loading feature"/>;
+        return <Spin aria-label="Đang tải tính năng"/>;
     if (query.isError)
-        return <Alert type="error" title="Could not load feature" action={<Button onClick={() => void query.refetch()}>Retry</Button>}/>;
+        return <Alert type="error" title="Không thể tải tính năng" action={<Button onClick={() => void query.refetch()}>Thử lại</Button>}/>;
     return <>{children(query.data)}</>;
 }

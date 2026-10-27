@@ -1,4 +1,5 @@
 import { z } from "zod";
+z.config(z.locales.vi());
 
 export const featureInputSchema = z.strictObject({
   product_id: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
@@ -18,7 +19,7 @@ export const featureUpdateSchema = featureInputSchema.extend({
   feature_type: featureInputSchema.shape.feature_type.nullable(),
 }).partial().refine(
   (data) => Object.entries(data).some(([key, value]) => value !== undefined && (value !== null || ["description", "unit", "unit_id"].includes(key))),
-  { message: "Provide at least one field to update." },
+  { message: "Cung cấp ít nhất một trường cần cập nhật." },
 );
 
 export const featureFormSchema = featureInputSchema.extend({

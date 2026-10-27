@@ -11,7 +11,7 @@ function load(path, imports = {}) {
   }).outputText;
   const compiled = { exports: {} };
   new Function("require", "module", "exports", source)(
-    (name) => imports[name] ?? require(name), compiled, compiled.exports,
+    (name) => imports[name] ?? (name === "@/lib/display-labels" ? load("lib/display-labels.ts") : require(name)), compiled, compiled.exports,
   );
   return compiled.exports;
 }
@@ -44,7 +44,7 @@ for (const domain of ["product", "login"]) {
       : load("features/auth/login-page.tsx", imports).default;
     render({ onSaved: () => calls.push(["saved"]) });
     await mutation.onSuccess();
-    assert.deepEqual(calls[0], ["success", domain === "product" ? "Product created." : "Signed in."]);
+    assert.deepEqual(calls[0], ["success", domain === "product" ? "Đã tạo sản phẩm." : "Đăng nhập thành công."]);
     assert.ok(calls.some((call) => call[0] === (domain === "product" ? "saved" : "navigate")));
     const before = calls.length;
     mutation.onError(new Error("secret backend message"));
@@ -53,7 +53,7 @@ for (const domain of ["product", "login"]) {
     if (domain === "product") {
       render({ product: { id: 1 }, onSaved: () => {} });
       await mutation.onSuccess();
-      assert.ok(calls.some((call) => call[0] === "success" && call[1] === "Product updated."));
+      assert.ok(calls.some((call) => call[0] === "success" && call[1] === "Đã cập nhật sản phẩm."));
     }
   });
 }

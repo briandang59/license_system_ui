@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+z.config(z.locales.vi());
 import {
   featureInputSchema,
   featureUpdateSchema,
@@ -9,7 +10,7 @@ import {
 
 function failure(status: number, code: string) {
   return NextResponse.json(
-    { success: false, error: { code, message: "Feature request failed." } },
+    { success: false, error: { code, message: "Không thể thực hiện yêu cầu về tính năng." } },
     { status, headers: { "Cache-Control": "no-store" } },
   );
 }
@@ -43,8 +44,12 @@ export async function handleFeature(request: Request, id?: string) {
   if (!/^\d+$/.test(offset) || Number(offset) > 2147483647 || !Number.isSafeInteger(Number(offset)))
     return failure(400, "VALIDATION_ERROR");
   const search = params.get("search")?.trim() ?? "";
+  const productId = params.get("product_id");
+  if (productId !== null && (!/^[1-9]\d*$/.test(productId) || !Number.isSafeInteger(Number(productId))))
+    return failure(400, "VALIDATION_ERROR");
   const query = new URLSearchParams({ limit: "20", offset });
   if (method === "GET" && search) query.set("search", search);
+  if (method === "GET" && productId !== null) query.set("product_id", productId);
   const path = id ? `/features/${id}` : `/features?${query}`;
   try {
     const response = await fetch(

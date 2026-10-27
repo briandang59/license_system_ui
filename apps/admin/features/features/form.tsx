@@ -44,24 +44,24 @@ export function FeatureForm({ feature, onSaved }: { feature?: Feature; onSaved: 
     },
     onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: async () => {
-      void message.success(feature ? "Feature updated." : "Feature created.");
+      void message.success(feature ? "Đã cập nhật tính năng." : "Đã tạo tính năng.");
       await queryClient.invalidateQueries({ queryKey: ["features"] });
       onSaved();
     },
   });
   return (
     <form noValidate onSubmit={handleSubmit((data) => { if (!save.isPending) save.mutate(data); })}>
-      <ProductSelect control={control} name="product_id" label="Product" productId={feature?.product_id} disabled={save.isPending} />
-      <FormInput control={control} name="code" label="Code" disabled={save.isPending} />
-      <FormInput control={control} name="name" label="Name" disabled={save.isPending} />
-      <FormTextarea control={control} name="description" label="Description" disabled={save.isPending} rows={3} />
-      <UnitSelect control={control} name="unit_id" label="Unit" unitId={feature?.unit_id ?? undefined} allowClear disabled={save.isPending} />
-      <FormSelect control={control} name="feature_type" label="Feature type" disabled={save.isPending}
-        options={[{ value: "boolean", label: "Boolean" }, { value: "quantity", label: "Quantity" }, { value: "unlimited", label: "Unlimited" }]} />
-      <FormSelect control={control} name="status" label="Status" disabled={save.isPending}
-        options={[{ value: "active", label: "Active" }, { value: "inactive", label: "Inactive" }]} />
+      <ProductSelect control={control} name="product_id" label="Sản phẩm" productId={feature?.product_id} disabled={save.isPending} />
+      <FormInput control={control} name="code" label="Mã" disabled={save.isPending} />
+      <FormInput control={control} name="name" label="Tên" disabled={save.isPending} />
+      <FormTextarea control={control} name="description" label="Mô tả" disabled={save.isPending} rows={3} />
+      <UnitSelect control={control} name="unit_id" label="Đơn vị tính" unitId={feature?.unit_id ?? undefined} allowClear disabled={save.isPending} />
+      <FormSelect control={control} name="feature_type" label="Loại tính năng" disabled={save.isPending}
+        options={[{ value: "boolean", label: "Bật/tắt" }, { value: "quantity", label: "Số lượng" }, { value: "unlimited", label: "Không giới hạn" }]} />
+      <FormSelect control={control} name="status" label="Trạng thái" disabled={save.isPending}
+        options={[{ value: "active", label: "Hoạt động" }, { value: "inactive", label: "Ngừng hoạt động" }]} />
       <Button htmlType="submit" type="primary" loading={save.isPending} block>
-        {feature ? "Save changes" : "Create feature"}
+        {feature ? "Lưu thay đổi" : "Tạo tính năng"}
       </Button>
     </form>
   );

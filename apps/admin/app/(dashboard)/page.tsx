@@ -2,36 +2,35 @@ export default function Home() {
   return (
     <div>
       <p className="text-xs font-semibold uppercase tracking-widest text-accent">
-        Workspace overview
+        Tổng quan hệ thống
       </p>
       <h1 className="mt-3 text-3xl font-semibold tracking-tight">
-        Welcome to your workspace
+        Chào mừng đến với hệ thống quản lý
       </h1>
       <p className="mt-3 max-w-xl text-sm leading-6 text-muted">
-        Keep your license operations organized. Your catalogs will appear here
-        as management features become available.
+        Quản lý bản quyền và các danh mục tập trung. Chọn một mục trong menu để bắt đầu.
       </p>
       <section
-        aria-label="Management catalogs"
+        aria-label="Danh mục quản lý"
         className="mt-8 grid gap-5 sm:grid-cols-3"
       >
-        {["Licenses", "Products", "Customers"].map((name) => (
+        {["Bản quyền", "Sản phẩm", "Khách hàng"].map((name) => (
           <article
             key={name}
             className="rounded-xl border border-line bg-surface p-6"
           >
             <span className="rounded-full bg-surface-subtle px-3 py-1 text-xs text-muted">
-              Coming soon
+              Sắp ra mắt
             </span>
             <h2 className="mt-5 text-lg font-semibold">{name}</h2>
             <p className="mt-2 text-sm leading-6 text-muted">
-              A dedicated place to manage your {name.toLowerCase()}.
+              Khu vực quản lý {name.toLowerCase()}.
             </p>
           </article>
         ))}
       </section>
       <p className="mt-8 text-xs text-muted">
-        License System · Management workspace
+        Hệ thống quản lý bản quyền
       </p>
     </div>
   );

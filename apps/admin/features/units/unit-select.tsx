@@ -34,11 +34,11 @@ export default function UnitSelect<T extends FieldValues>({ unitId, ...props }: 
                         void units.refetch();
                     if (selected.isError)
                         void selected.refetch();
-                }}>Retry units</Button>}/>
+                }}>Tải lại đơn vị tính</Button>}/>
         </div>)}
       {units.hasNextPage && (<Button className="mb-4" disabled={props.disabled} loading={units.isFetchingNextPage} onClick={() => { if (!units.isFetching)
             void units.fetchNextPage(); }}>
-          Load more units
+          Tải thêm đơn vị tính
         </Button>)}
     </>);
 }

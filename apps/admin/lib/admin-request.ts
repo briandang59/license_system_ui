@@ -9,7 +9,7 @@ type Options = {
     paginated?: boolean;
     queryKeys?: string[];
 };
-function failure(status: number, code: string) { return NextResponse.json({ success: false, error: { code, message: "Request could not be completed." } }, { status, headers: { "Cache-Control": "no-store" } }); }
+function failure(status: number, code: string) { return NextResponse.json({ success: false, error: { code, message: "Không thể hoàn tất yêu cầu." } }, { status, headers: { "Cache-Control": "no-store" } }); }
 // Transport shared by the new admin resources; schemas and endpoint policy remain in each feature.
 export async function forwardAdminRequest(request: Request, options: Options) {
     const method = request.method;

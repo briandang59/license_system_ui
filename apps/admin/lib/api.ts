@@ -3,7 +3,7 @@ import type { BaseResponse } from "./baseResponse";
 export class ApiError extends Error {
   constructor(
     public status: number,
-    message = `Request failed (${status}). Please try again.`,
+    message = `Yêu cầu thất bại (${status}). Vui lòng thử lại.`,
     public code?: string,
   ) {
     super(message);
@@ -24,11 +24,11 @@ export async function api<T>(path: string, options?: RequestInit): Promise<T> {
   try {
     body = await response.json();
   } catch {
-    throw new ApiError(response.status, "Server returned an invalid JSON response.");
+    throw new ApiError(response.status, "Máy chủ trả về dữ liệu JSON không hợp lệ.");
   }
 
   if (!body || typeof body.success !== "boolean") {
-    throw new ApiError(response.status, "Server returned an invalid API response.");
+    throw new ApiError(response.status, "Máy chủ trả về phản hồi API không hợp lệ.");
   }
 
   if (!response.ok || !body.success) {
@@ -40,7 +40,7 @@ export async function api<T>(path: string, options?: RequestInit): Promise<T> {
   }
 
   if (!("data" in body)) {
-    throw new ApiError(response.status, "Server response is missing data.");
+    throw new ApiError(response.status, "Phản hồi máy chủ thiếu dữ liệu.");
   }
 
   return body.data;

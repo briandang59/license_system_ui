@@ -8,9 +8,14 @@ import type {
 } from "@/features/features/schema";
 
 export const featureService = {
-  getAll: (offset = 0, signal?: AbortSignal, search = "") => {
+  getForProduct: async (productId: number, offset = 0, signal?: AbortSignal, search = "") => {
+    const page = await featureService.getAll(offset, signal, search, productId);
+    return { items: page.items, hasMore: page.items.length === page.limit };
+  },
+  getAll: (offset = 0, signal?: AbortSignal, search = "", productId?: number) => {
     const query = new URLSearchParams({ limit: "20", offset: String(offset) });
     if (search.trim()) query.set("search", search.trim());
+    if (productId !== undefined) query.set("product_id", String(productId));
     return api<FeatureList>(`${featureUrls.list}?${query}`, { signal });
   },
   getById: (id: number, signal?: AbortSignal) =>

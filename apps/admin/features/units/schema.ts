@@ -1,11 +1,12 @@
 import { z } from "zod";
+z.config(z.locales.vi());
 export const unitInputSchema = z.strictObject({
     code: z.string().trim().min(2).max(50),
     name: z.string().trim().min(2).max(100),
     symbol: z.string().trim().max(20).nullish(),
     status: z.enum(["active", "inactive"]).optional(),
 });
-export const unitUpdateSchema = unitInputSchema.partial().refine(data => Object.values(data).some(v => v !== undefined), { message: "Provide at least one field to update." });
+export const unitUpdateSchema = unitInputSchema.partial().refine(data => Object.values(data).some(v => v !== undefined), { message: "Cung cấp ít nhất một trường cần cập nhật." });
 export const unitFormSchema = unitInputSchema.extend({
     symbol: z.string().trim().max(20),
     status: z.enum(["active", "inactive"]),

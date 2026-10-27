@@ -8,9 +8,16 @@ import type {
   PlanFeature,
   PlanFeatureInput,
   PlanFeatureList,
+  PlanFeatureUpdate,
 } from "@/features/plans/schema";
 
 export const planService = {
+  updateFeature: (id: number, featureId: number, data: PlanFeatureUpdate) =>
+    api<PlanFeature>(planUrls.feature(id, featureId), {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    }),
   getFeatures: async (id: number, signal?: AbortSignal) => {
     const items: PlanFeature[] = [];
     let offset = 0;
@@ -31,7 +38,7 @@ export const planService = {
       }),
     )),
   getAll: (offset = 0, signal?: AbortSignal, search = "") => {
-    const query = new URLSearchParams({ limit: "20", offset: String(offset) });
+    const query = new URLSearchParams({ limit: "20", offset: String(offset), include: "features,product" });
     if (search.trim()) query.set("search", search.trim());
     return api<PlanList>(`${planUrls.list}?${query}`, { signal });
   },

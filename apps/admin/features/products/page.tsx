@@ -47,7 +47,7 @@ export default function ProductsPage() {
     mutationFn: productService.remove,
     onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: async () => {
-      void message.success("Product deleted.");
+      void message.success("Đã xóa sản phẩm.");
       setSelectedRowKeys([]);
       if (products.data?.items.length === 1 && offset > 0)
         setOffset(offset - 20);
@@ -59,13 +59,13 @@ export default function ProductsPage() {
     <div>
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Products</h1>
+          <h1 className="text-2xl font-semibold">Sản phẩm</h1>
           <p className="mt-2 text-sm text-muted">
-            Create and manage your product catalog.
+            Tạo và quản lý danh mục sản phẩm.
           </p>
         </div>
         <Button type="primary" icon={<Plus size={16} aria-hidden="true" />} onClick={() => setDialog({ mode: "create" })}>
-          Add product
+          Thêm sản phẩm
         </Button>
       </div>
       {products.isError && (
@@ -80,7 +80,7 @@ export default function ProductsPage() {
                   void products.refetch();
                 }}
               >
-                Retry
+                Thử lại
               </Button>
             }
           />
@@ -88,18 +88,18 @@ export default function ProductsPage() {
       )}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <Input.Search
-          aria-label="Search products"
-          placeholder="Search name or code"
+          aria-label="Tìm sản phẩm"
+          placeholder="Tìm theo tên hoặc mã"
           allowClear
           style={{ maxWidth: 420 }}
-          enterButton={<Button aria-label="Search products" title="Search products" icon={<Search size={16} aria-hidden="true" />} />}
+          enterButton={<Button aria-label="Tìm sản phẩm" title="Tìm sản phẩm" icon={<Search size={16} aria-hidden="true" />} />}
           onSearch={(value) => {
             setSearch(value.trim());
             setOffset(0);
             setSelectedRowKeys([]);
           }}
         />
-        <div className="flex flex-wrap items-center gap-3"><DataTransferActions resource="products" filters={{search}} /><span className="text-sm text-muted" aria-live="polite">{selectedRowKeys.length} selected</span></div>
+        <div className="flex flex-wrap items-center gap-3"><DataTransferActions resource="products" filters={{search}} /><span className="text-sm text-muted" aria-live="polite">{selectedRowKeys.length} đã chọn</span></div>
       </div>
       <Table<Product>
         rowKey="id"
@@ -127,9 +127,9 @@ export default function ProductsPage() {
           disabled={offset === 0 || products.isFetching}
           onClick={() => { setOffset(offset - 20); setSelectedRowKeys([]); }}
         >
-          Previous
+          Trước
         </Button>
-        <span className="text-sm text-muted">Page {offset / 20 + 1}</span>
+        <span className="text-sm text-muted">Trang {offset / 20 + 1}</span>
         <Button
           icon={<ChevronRight size={16} aria-hidden="true" />}
           disabled={
@@ -139,16 +139,16 @@ export default function ProductsPage() {
           }
           onClick={() => { setOffset(offset + 20); setSelectedRowKeys([]); }}
         >
-          Next
+          Tiếp
         </Button>
       </div>
       <Modal
         title={
           dialog?.mode === "create"
-            ? "Add product"
+            ? "Thêm sản phẩm"
             : dialog?.mode === "edit"
-              ? "Edit product"
-              : "Product details"
+              ? "Sửa sản phẩm"
+              : "Chi tiết sản phẩm"
         }
         open={!!dialog}
         onCancel={() => setDialog(null)}
@@ -158,14 +158,14 @@ export default function ProductsPage() {
         {dialog?.mode === "create" ? (
           <ProductForm onSaved={() => setDialog(null)} />
         ) : detail.isPending ? (
-          <Spin aria-label="Loading product" />
+          <Spin aria-label="Đang tải sản phẩm" />
         ) : detail.isError ? (
           <div role="alert">
             <Alert
               type="error"
               title={getApiErrorMessage(detail.error)}
               action={
-                <Button icon={<RotateCw size={16} aria-hidden="true" />} onClick={() => void detail.refetch()}>Retry</Button>
+                <Button icon={<RotateCw size={16} aria-hidden="true" />} onClick={() => void detail.refetch()}>Thử lại</Button>
               }
             />
           </div>

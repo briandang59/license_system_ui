@@ -17,7 +17,7 @@ export async function handlePricing(request: Request) {
             return Response.json({ success: false, error: { code: "PRICING_UNAVAILABLE" } }, { status: res.status === 400 ? 400 : 502, headers: { "Cache-Control": "no-store" } });
         const raw: unknown = await res.json();
         if (typeof raw !== "object" || raw === null || !("success" in raw) || raw.success !== true || !("data" in raw))
-            throw new Error("Invalid response");
+            throw new Error("Phản hồi không hợp lệ");
         const data = pricingSchema.parse(raw.data);
         return Response.json({ success: true, data }, { headers: { "Cache-Control": "no-store" } });
     }

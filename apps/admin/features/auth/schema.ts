@@ -1,8 +1,9 @@
 import { z } from "zod";
+z.config(z.locales.vi());
 
 export const loginSchema = z.object({
-  email: z.string().trim().email("Enter a valid email address."),
-  password: z.string().min(1, "Enter your password."),
+  email: z.string().trim().email("Nhập địa chỉ email hợp lệ."),
+  password: z.string().min(1, "Vui lòng nhập mật khẩu."),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;

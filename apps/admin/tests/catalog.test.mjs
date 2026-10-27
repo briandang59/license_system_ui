@@ -11,7 +11,7 @@ function load(path, imports = {}) {
   }).outputText;
   const compiled = { exports: {} };
   new Function("require", "module", "exports", source)(
-    (name) => imports[name] ?? (name === "@/features/units/unit-select" ? (() => null) : require(name)), compiled, compiled.exports,
+    (name) => imports[name] ?? (name === "@/features/units/unit-select" ? (() => null) : (name === "@/lib/display-labels" ? load("lib/display-labels.ts") : require(name))), compiled, compiled.exports,
   );
   return compiled.exports;
 }
@@ -128,13 +128,13 @@ for (const [name, plural] of domains) {
     await service.getAll(20, signal);
     await service.getById(1, signal);
     await service.create(input);
-    await service.update(1, { name: "Updated" });
+    await service.update(1, { name: "Ngày cập nhật" });
     await service.remove(1);
-    assert.deepEqual(calls.map(({ url }) => url), [`/api/${plural}?limit=20&offset=20`, `/api/${plural}/1`, `/api/${plural}`, `/api/${plural}/1`, `/api/${plural}/1`]);
+    assert.deepEqual(calls.map(({ url }) => url), [`/api/${plural}?limit=20&offset=20${name === "plan" ? "&include=features%2Cproduct" : ""}`, `/api/${plural}/1`, `/api/${plural}`, `/api/${plural}/1`, `/api/${plural}/1`]);
     assert.equal(calls[0].options.signal, signal);
     assert.equal(calls[1].options.signal, signal);
     assert.equal(calls[2].options.method, "POST");
-    assert.deepEqual(JSON.parse(calls[3].options.body), { name: "Updated" });
+    assert.deepEqual(JSON.parse(calls[3].options.body), { name: "Ngày cập nhật" });
     assert.equal(calls[3].options.method, "PATCH");
     assert.equal(calls[4].options.method, "DELETE");
   });
@@ -198,7 +198,8 @@ for (const [name, plural] of domains) {
     if (name === "feature") assert.equal("unit" in payload, false, "Editing a feature must preserve independent legacy unit text");
     await mutation.onSuccess();
     assert.equal(saved, 1);
-    assert.ok(calls.some((call) => call[0] === "success" && call[1] === `${cap} updated.`));
+    const entityLabel = { company: "doanh nghiệp", plan: "gói dịch vụ", feature: "tính năng" }[name];
+    assert.ok(calls.some((call) => call[0] === "success" && call[1] === `Đã cập nhật ${entityLabel}.`));
     assert.deepEqual(calls.at(-1), ["invalidate", { queryKey: [plural] }]);
     mutation.onError(new Error("secret backend detail"));
     assert.deepEqual(calls.at(-1), ["error", "Request failed"]);
@@ -232,7 +233,7 @@ test("product selector loads further pages, keeps selected products and retries 
       useQuery: () => ({ data: { id: 99, name: "Selected", code: "SELECTED" } }),
     },
   });
-  const [select, error, more] = ProductSelect({ control: {}, name: "product_id", label: "Product", productId: 99 }).props.children;
+  const [select, error, more] = ProductSelect({ control: {}, name: "product_id", label: "Sản phẩm", productId: 99 }).props.children;
   assert.deepEqual(select.props.options.map(({ value }) => value), [1, 99]);
   more.props.onClick();
   error.props.children.props.action.props.onClick();

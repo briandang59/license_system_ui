@@ -45,13 +45,13 @@ export default function CompanySelect<T extends FieldValues>({
             action={<Button onClick={() => {
               if (companies.isError) void companies.refetch();
               if (selected.isError) void selected.refetch();
-            }}>Retry companies</Button>} />
+            }}>Tải lại doanh nghiệp</Button>} />
         </div>
       )}
       {companies.hasNextPage && (
         <Button className="mb-4" disabled={props.disabled} loading={companies.isFetchingNextPage}
           onClick={() => { if (!companies.isFetching) void companies.fetchNextPage(); }}>
-          Load more companies
+          Tải thêm doanh nghiệp
         </Button>
       )}
     </>

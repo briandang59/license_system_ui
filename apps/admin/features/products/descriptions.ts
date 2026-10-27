@@ -1,4 +1,5 @@
 import type { DescriptionsProps } from "antd";
+import { displayLabel } from "@/lib/display-labels";
 import type { Product } from "@/features/products/schema";
 import { formatDateTime } from "@/utils/functions/formatDateTime";
 
@@ -6,26 +7,26 @@ export function getProductDescriptionItems(
   product: Product,
 ): NonNullable<DescriptionsProps["items"]> {
   return [
-    { key: "code", label: "Code", children: product.code },
-    { key: "name", label: "Name", children: product.name },
+    { key: "code", label: "Mã", children: product.code },
+    { key: "name", label: "Tên", children: product.name },
     {
       key: "description",
-      label: "Description",
+      label: "Mô tả",
       children: product.description || "—",
     },
     {
       key: "status",
-      label: "Status",
-      children: product.status,
+      label: "Trạng thái",
+      children: displayLabel(product.status),
     },
     {
       key: "created",
-      label: "Created",
+      label: "Ngày tạo",
       children: formatDateTime(product.created_at),
     },
     {
       key: "updated",
-      label: "Updated",
+      label: "Ngày cập nhật",
       children: formatDateTime(product.updated_at),
     },
   ];

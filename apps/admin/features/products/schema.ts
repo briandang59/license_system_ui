@@ -1,4 +1,5 @@
 import { z } from "zod";
+z.config(z.locales.vi());
 
 export const productInputSchema = z.object({
   code: z.string().trim().min(2).max(100),

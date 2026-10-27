@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+z.config(z.locales.vi());
 import {
   productInputSchema,
   productUpdateSchema,
@@ -9,7 +10,7 @@ import {
 
 function failure(status: number, code: string) {
   return NextResponse.json(
-    { success: false, error: { code, message: "Product request failed." } },
+    { success: false, error: { code, message: "Không thể thực hiện yêu cầu về sản phẩm." } },
     { status, headers: { "Cache-Control": "no-store" } },
   );
 }

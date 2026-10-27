@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+z.config(z.locales.vi());
 import {
   authUserSchema,
   loginSchema,
@@ -24,7 +25,7 @@ function failure(status: number, code: string) {
     {
       success: false,
       data: null,
-      error: { code, message: "Authentication request failed." },
+      error: { code, message: "Không thể thực hiện yêu cầu xác thực." },
     },
     { status, headers: { "Cache-Control": "no-store" } },
   );

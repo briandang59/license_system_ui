@@ -47,13 +47,13 @@ export default function FeatureSelect<T extends FieldValues>({
             action={<Button onClick={() => {
               if (features.isError) void features.refetch();
               if (selected.isError) void selected.refetch();
-            }}>Retry features</Button>} />
+            }}>Tải lại tính năng</Button>} />
         </div>
       )}
       {features.hasNextPage && (
         <Button className="mb-4" disabled={props.disabled} loading={features.isFetchingNextPage}
           onClick={() => { if (!features.isFetching) void features.fetchNextPage(); }}>
-          Load more features
+          Tải thêm tính năng
         </Button>
       )}
     </>

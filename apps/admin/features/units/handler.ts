@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+z.config(z.locales.vi());
 import { unitInputSchema, unitUpdateSchema, unitSchema, unitListSchema, } from "@/features/units/schema";
 function failure(status: number, code: string) {
-    return NextResponse.json({ success: false, error: { code, message: "Unit request failed." } }, { status, headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json({ success: false, error: { code, message: "Không thể thực hiện yêu cầu về đơn vị tính." } }, { status, headers: { "Cache-Control": "no-store" } });
 }
 export async function handleUnit(request: Request, id?: string) {
     const method = request.method;

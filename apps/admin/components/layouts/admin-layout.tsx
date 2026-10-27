@@ -7,21 +7,22 @@ import { Avatar, Button, Drawer, Menu } from "antd";
 import { Building2, CalendarCheck, ChevronRight, Layers3, LayoutDashboard, LogOut, Menu as MenuIcon, Package, Puzzle, Ruler, ShieldCheck } from "lucide-react";
 import ThemeSwitcher from "@/components/ui/theme-switcher";
 import { useLogout } from "@/features/auth/use-logout";
+import { displayLabel } from "@/lib/display-labels";
 
 const items = [
-  { key: "/", icon: <LayoutDashboard size={17} aria-hidden="true" />, label: <Link href="/">Overview</Link> },
+  { key: "/", icon: <LayoutDashboard size={17} aria-hidden="true" />, label: <Link href="/">Tổng quan</Link> },
   {
     key: "catalogs",
-    label: "Catalogs",
+    label: "Danh mục",
     type: "group" as const,
     children: [
-      { key: "/licenses", icon: <ShieldCheck size={17} aria-hidden="true" />, label: <Link href="/licenses">Licenses</Link> },
-      { key: "/products", icon: <Package size={17} aria-hidden="true" />, label: <Link href="/products">Products</Link> },
-      { key: "/companies", icon: <Building2 size={17} aria-hidden="true" />, label: <Link href="/companies">Companies</Link> },
-      { key: "/plans", icon: <Layers3 size={17} aria-hidden="true" />, label: <Link href="/plans">Plans</Link> },
-      { key: "/units", icon: <Ruler size={17} aria-hidden="true" />, label: <Link href="/units">Units</Link> },
-      { key: "/subscriptions", icon: <CalendarCheck size={17} aria-hidden="true" />, label: <Link href="/subscriptions">Subscriptions</Link> },
-      { key: "/features", icon: <Puzzle size={17} aria-hidden="true" />, label: <Link href="/features">Features</Link> },
+      { key: "/licenses", icon: <ShieldCheck size={17} aria-hidden="true" />, label: <Link href="/licenses">Bản quyền</Link> },
+      { key: "/products", icon: <Package size={17} aria-hidden="true" />, label: <Link href="/products">Sản phẩm</Link> },
+      { key: "/companies", icon: <Building2 size={17} aria-hidden="true" />, label: <Link href="/companies">Doanh nghiệp</Link> },
+      { key: "/plans", icon: <Layers3 size={17} aria-hidden="true" />, label: <Link href="/plans">Gói dịch vụ</Link> },
+      { key: "/units", icon: <Ruler size={17} aria-hidden="true" />, label: <Link href="/units">Đơn vị tính</Link> },
+      { key: "/subscriptions", icon: <CalendarCheck size={17} aria-hidden="true" />, label: <Link href="/subscriptions">Đăng ký dịch vụ</Link> },
+      { key: "/features", icon: <Puzzle size={17} aria-hidden="true" />, label: <Link href="/features">Tính năng</Link> },
     ],
   },
 ];
@@ -30,14 +31,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const logout = useLogout();
   const [menuOpen, setMenuOpen] = useState(false);
-  const pageTitle = pathname === "/" ? "Overview" : pathname.split("/")[1];
+  const pageTitle = pathname === "/" ? "Tổng quan" : displayLabel(pathname.split("/")[1]);
   const navigation = (
-    <nav aria-label="Main navigation">
+    <nav aria-label="Điều hướng chính">
       <div className="flex h-20 items-center gap-3 px-6 font-semibold tracking-tight text-foreground">
         <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-line text-accent">
           <ShieldCheck size={21} aria-hidden="true" />
         </span>
-        License System
+        Hệ thống bản quyền
       </div>
       <Menu
         mode="inline"
@@ -55,14 +56,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:z-50 focus:bg-surface focus:p-3"
       >
-        Skip to content
+        Chuyển đến nội dung
       </a>
       <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-line bg-surface lg:flex">
         {navigation}
-        <div className="mx-6 mt-auto border-t border-line py-5 text-xs text-muted">License management workspace</div>
+        <div className="mx-6 mt-auto border-t border-line py-5 text-xs text-muted">Không gian quản lý bản quyền</div>
       </aside>
       <Drawer
-        title="Navigation"
+        title="Điều hướng"
         placement="left"
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
@@ -75,14 +76,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <div className="lg:hidden">
               <Button
                 onClick={() => setMenuOpen(true)}
-                aria-label="Open navigation"
+                aria-label="Mở menu điều hướng"
                 aria-expanded={menuOpen}
                 icon={<MenuIcon size={17} aria-hidden="true" />}
               >
               </Button>
             </div>
             <div className="hidden items-center gap-3 text-sm sm:flex">
-              <span className="text-muted">Workspace</span><ChevronRight size={14} className="text-muted" aria-hidden="true" />
+              <span className="text-muted">Hệ thống quản lý</span><ChevronRight size={14} className="text-muted" aria-hidden="true" />
               <span className="font-medium capitalize">{pageTitle}</span>
             </div>
           </div>
@@ -94,12 +95,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <Button
               loading={logout.isPending}
               icon={<LogOut size={16} aria-hidden="true" />}
-              aria-label="Sign out" title="Sign out"
+              aria-label="Đăng xuất" title="Đăng xuất"
               onClick={() => {
                 if (!logout.isPending) logout.mutate();
               }}
             >
-              <span className="hidden sm:inline">Sign out</span>
+              <span className="hidden sm:inline">Đăng xuất</span>
             </Button>
           </div>
         </header>

@@ -6,5 +6,5 @@ export default function UnitLabel({ id, fallback }: {
     fallback?: string | null;
 }) {
     const unit = useQuery({ queryKey: ["units", "detail", id], queryFn: ({ signal }) => unitService.getById(id!, signal), enabled: !!id });
-    return <>{unit.data?.symbol || unit.data?.name || fallback || "Not set"}</>;
+    return <>{unit.data?.symbol || unit.data?.name || fallback || "Chưa thiết lập"}</>;
 }

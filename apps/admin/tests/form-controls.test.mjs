@@ -16,7 +16,7 @@ function load(path, imports = {}) {
   }).outputText;
   const compiled = { exports: {} };
   new Function("require", "module", "exports", source)(
-    (name) => imports[name] ?? require(name), compiled, compiled.exports,
+    (name) => imports[name] ?? (name === "@/lib/display-labels" ? load("lib/display-labels.ts") : require(name)), compiled, compiled.exports,
   );
   return compiled.exports;
 }

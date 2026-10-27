@@ -18,7 +18,7 @@ export function useLogout() {
     onSuccess: async () => {
       await queryClient.cancelQueries();
       queryClient.clear();
-      void message.success("Signed out.");
+      void message.success("Đăng xuất thành công.");
       router.replace("/auth/login");
       router.refresh();
     },

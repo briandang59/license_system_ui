@@ -1,5 +1,19 @@
 # License System frontend
 
+Toàn bộ giao diện admin và website khách hàng dùng tiếng Việt (HTML vi, Ant Design
+vi_VN, Zod tiếng Việt, số/tiền vi-VN). Nhãn trạng thái/chu kỳ được dịch khi hiển thị;
+API, enum, mã nghiệp vụ và dữ liệu do người dùng nhập giữ nguyên. Quy tắc bắt buộc
+được ghi trong AGENTS.md và skill của repository.
+
+Plans tải `include=features,product`, hiển thị Product và số Feature enabled/configured.
+Mở rộng dòng để xem trạng thái, hạn mức và đơn vị; cấu hình cũng hiển thị Feature đã có.
+Backend cần trả unit_id nullable cho Feature được include trong Plan.
+Nút Edit trong bảng Feature đã cấu hình cho phép sửa enabled và limit (quantity),
+gọi PATCH theo cả planId/featureId; ô limit trống gửi null, giữ nguyên giá trị 0.
+
+Configure plan features gọi API Feature list với `product_id` của Plan; backend
+lọc trước phân trang. Cần backend có hỗ trợ query này khi triển khai FE.
+
 Admin có nút Import/Export CSV ngay tại các trang catalog, Plan Features và bảng giá.
 Subscription/add-on chỉ export; trang Licenses cung cấp export License và các dữ liệu
 liên quan. Không có trang import/export riêng. Xem [Data transfer — 20261027](docs/20261027_data_transfer.md).

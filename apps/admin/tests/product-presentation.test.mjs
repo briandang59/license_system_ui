@@ -12,7 +12,7 @@ function load(path, imports = {}) {
   }).outputText;
   const compiled = { exports: {} };
   new Function("require", "module", "exports", source)(
-    (name) => imports[name] ?? require(name), compiled, compiled.exports,
+    (name) => imports[name] ?? (name === "@/lib/display-labels" ? load("lib/display-labels.ts") : require(name)), compiled, compiled.exports,
   );
   return compiled.exports;
 }
@@ -53,11 +53,11 @@ test("product actions preserve record IDs, confirmation and pending deletion sta
 test("product descriptions preserve values, empty fallback and date formatting", () => {
   for (const description of [null, "", "Product description"]) {
     const items = getProductDescriptionItems({
-      code: "CODE", name: "Product", status: "active", description,
+      code: "CODE", name: "Sản phẩm", status: "active", description,
       created_at: "2026-10-16T09:00:00", updated_at: "2026-10-16T10:00:00",
     });
     assert.deepEqual(items.map(({ children }) => children), [
-      "CODE", "Product", description || "—", "active", "2026-10-16 09:00:00", "2026-10-16 10:00:00",
+      "CODE", "Sản phẩm", description || "—", "Hoạt động", "2026-10-16 09:00:00", "2026-10-16 10:00:00",
     ]);
   }
 });

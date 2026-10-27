@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+z.config(z.locales.vi());
 import { exportResourceSchema, importResources, importResultSchema, maxFileBytes } from "./schema";
 const filters = ["search", "status", "product_id", "plan_id", "feature_id", "company_id", "subscription_id", "license_id"];
-function failure(status: number, code: string) { return NextResponse.json({ success: false, error: { code, message: "Data transfer request failed." } }, { status, headers: { "Cache-Control": "no-store" } }); }
+function failure(status: number, code: string) { return NextResponse.json({ success: false, error: { code, message: "Không thể thực hiện yêu cầu nhập/xuất dữ liệu." } }, { status, headers: { "Cache-Control": "no-store" } }); }
 async function limitedForm(request: Request) {
     if (!request.headers.get("content-type")?.startsWith("multipart/form-data;"))
-        throw Error("Invalid form");
+        throw Error("Biểu mẫu không hợp lệ");
     const reader = request.body?.getReader();
     if (!reader)
-        throw Error("Missing body");
+        throw Error("Thiếu nội dung yêu cầu");
     const chunks: Uint8Array[] = [];
     let size = 0;
     try {
@@ -19,7 +20,7 @@ async function limitedForm(request: Request) {
             size += value.byteLength;
             if (size > maxFileBytes + 65536) {
                 await reader.cancel();
-                throw Error("Oversized body");
+                throw Error("Nội dung yêu cầu vượt giới hạn");
             }
             ;
             chunks.push(value);

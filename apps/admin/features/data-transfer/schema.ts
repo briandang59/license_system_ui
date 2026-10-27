@@ -1,4 +1,5 @@
 import { z } from "zod";
+z.config(z.locales.vi());
 export const importResources = ["products", "companies", "units", "features", "plans", "plan-features", "plan-prices", "feature-prices"] as const;
 export const exportResources = [...importResources, "subscriptions", "subscription-features", "licenses", "license-entitlements", "license-activations", "license-audit-logs"] as const;
 export const exportResourceSchema = z.enum(exportResources);

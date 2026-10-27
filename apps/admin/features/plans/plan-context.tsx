@@ -12,8 +12,8 @@ export default function PlanContext({ id, children }: {
 }) {
     const query = useQuery({ queryKey: ["plans", "detail", id], queryFn: ({ signal }) => planService.getById(id, signal) });
     if (query.isPending)
-        return <Spin aria-label="Loading plan"/>;
+        return <Spin aria-label="Đang tải gói dịch vụ"/>;
     if (query.isError)
-        return <Alert type="error" title="Could not load plan" action={<Button onClick={() => void query.refetch()}>Retry</Button>}/>;
+        return <Alert type="error" title="Không thể tải gói dịch vụ" action={<Button onClick={() => void query.refetch()}>Thử lại</Button>}/>;
     return <>{children(query.data)}</>;
 }

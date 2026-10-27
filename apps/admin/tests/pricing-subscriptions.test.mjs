@@ -6,7 +6,7 @@ import { dirname,resolve } from "node:path";
 import ts from "typescript";
 const require=createRequire(import.meta.url);
 const cache=new Map();
-function load(path){path=resolve(path);if(cache.has(path))return cache.get(path);const compiled={exports:{}};cache.set(path,compiled.exports);const source=ts.transpileModule(readFileSync(path,"utf8"),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,esModuleInterop:true}}).outputText;new Function("require","module","exports",source)(name=>name.startsWith("@/")?load(`${name.slice(2)}.ts`):name.startsWith(".")?load(resolve(dirname(path),`${name}.ts`)):require(name),compiled,compiled.exports);cache.set(path,compiled.exports);return compiled.exports;}
+function load(path){path=resolve(path);if(cache.has(path))return cache.get(path);const compiled={exports:{}};cache.set(path,compiled.exports);const source=ts.transpileModule(readFileSync(path,"utf8"),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,esModuleInterop:true}}).outputText;new Function("require","module","exports",source)(name=>name.startsWith("@/")?load(`${name.slice(2)}.ts`):name.startsWith(".")?load(resolve(dirname(path),`${name}.ts`)):(name === "@/lib/display-labels" ? load("lib/display-labels.ts") : require(name)),compiled,compiled.exports);cache.set(path,compiled.exports);return compiled.exports;}
 const prices=load("features/pricing/schema.ts");
 const subs=load("features/subscriptions/schema.ts");
 const units=load("features/units/schema.ts");

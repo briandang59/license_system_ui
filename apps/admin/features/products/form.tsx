@@ -46,7 +46,7 @@ export const ProductForm = ({
         : productService.create(data),
     onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: async () => {
-      void message.success(product ? "Product updated." : "Product created.");
+      void message.success(product ? "Đã cập nhật sản phẩm." : "Đã tạo sản phẩm.");
       await queryClient.invalidateQueries({ queryKey: ["products"] });
       onSaved();
     },
@@ -61,34 +61,34 @@ export const ProductForm = ({
       <FormInput
         control={control}
         name="code"
-        label="Code"
+        label="Mã"
         disabled={!!product || save.isPending}
       />
       <FormInput
         control={control}
         name="name"
-        label="Name"
+        label="Tên"
         disabled={save.isPending}
       />
       <FormTextarea
         control={control}
         name="description"
-        label="Description"
+        label="Mô tả"
         disabled={save.isPending}
         rows={3}
       />
       <FormSelect
         control={control}
         name="status"
-        label="Status"
+        label="Trạng thái"
         disabled={save.isPending}
         options={[
-          { value: "active", label: "Active" },
-          { value: "inactive", label: "Inactive" },
+          { value: "active", label: "Hoạt động" },
+          { value: "inactive", label: "Ngừng hoạt động" },
         ]}
       />
       <Button htmlType="submit" type="primary" loading={save.isPending} block>
-        {product ? "Save changes" : "Create product"}
+        {product ? "Lưu thay đổi" : "Tạo sản phẩm"}
       </Button>
     </form>
   );

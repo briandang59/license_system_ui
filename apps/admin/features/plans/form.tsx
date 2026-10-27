@@ -37,21 +37,21 @@ export function PlanForm({ plan, onSaved }: { plan?: Plan; onSaved: () => void }
     },
     onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: async () => {
-      void message.success(plan ? "Plan updated." : "Plan created.");
+      void message.success(plan ? "Đã cập nhật gói dịch vụ." : "Đã tạo gói dịch vụ.");
       await queryClient.invalidateQueries({ queryKey: ["plans"] });
       onSaved();
     },
   });
   return (
     <form noValidate onSubmit={handleSubmit((data) => { if (!save.isPending) save.mutate(data); })}>
-      <ProductSelect control={control} name="product_id" label="Product" productId={plan?.product_id} disabled={!!plan || save.isPending} />
-      <FormInput control={control} name="code" label="Code" disabled={!!plan || save.isPending} />
-      <FormInput control={control} name="name" label="Name" disabled={save.isPending} />
-      <FormTextarea control={control} name="description" label="Description" disabled={save.isPending} rows={3} />
-      <FormSelect control={control} name="status" label="Status" disabled={save.isPending}
-        options={[{ value: "active", label: "Active" }, { value: "inactive", label: "Inactive" }]} />
+      <ProductSelect control={control} name="product_id" label="Sản phẩm" productId={plan?.product_id} disabled={!!plan || save.isPending} />
+      <FormInput control={control} name="code" label="Mã" disabled={!!plan || save.isPending} />
+      <FormInput control={control} name="name" label="Tên" disabled={save.isPending} />
+      <FormTextarea control={control} name="description" label="Mô tả" disabled={save.isPending} rows={3} />
+      <FormSelect control={control} name="status" label="Trạng thái" disabled={save.isPending}
+        options={[{ value: "active", label: "Hoạt động" }, { value: "inactive", label: "Ngừng hoạt động" }]} />
       <Button htmlType="submit" type="primary" loading={save.isPending} block>
-        {plan ? "Save changes" : "Create plan"}
+        {plan ? "Lưu thay đổi" : "Tạo gói dịch vụ"}
       </Button>
     </form>
   );

@@ -1,3 +1,4 @@
+import { displayLabel } from "@/lib/display-labels";
 import { Button, Popconfirm, Space, Tag, type TableProps } from "antd";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import type { Product } from "@/features/products/schema";
@@ -21,42 +22,42 @@ export function getProductColumns({
 }: ProductColumnActions): NonNullable<TableProps<Product>["columns"]> {
   return [
     { title: "#", key: "index", width: 70, render: (_, __, index) => offset + index + 1 },
-    { title: "Code", dataIndex: "code" },
-    { title: "Name", dataIndex: "name" },
+    { title: "Mã", dataIndex: "code" },
+    { title: "Tên", dataIndex: "name" },
     {
-      title: "Status",
+      title: "Trạng thái",
       dataIndex: "status",
       render: (status: string) => (
         <Tag color={status === "active" ? "green" : "default"}>
-          {status}
+          {displayLabel(status)}
         </Tag>
       ),
     },
     {
-      title: "Actions",
+      title: "Thao tác",
       render: (_, product) => (
         <Space>
           <Button size="small" icon={<Eye size={16} aria-hidden="true" />}
-            aria-label={`View product ${product.name}`} title="View product"
+            aria-label={`Xem sản phẩm ${product.name}`} title="Xem sản phẩm"
             onClick={() => onView(product.id)} />
           <Button size="small" icon={<Pencil size={16} aria-hidden="true" />}
-            aria-label={`Edit product ${product.name}`} title="Edit product"
+            aria-label={`Sửa sản phẩm ${product.name}`} title="Sửa sản phẩm"
             onClick={() => onEdit(product.id)} />
           <Popconfirm
-            title="Delete product?"
-            description="This action cannot be undone."
+            title="Xóa sản phẩm?"
+            description="Không thể hoàn tác thao tác này."
             onConfirm={() => {
               if (!isDeleting) onDelete(product.id);
             }}
-            okText="Delete"
+            okText="Xóa"
             okButtonProps={{ danger: true }}
           >
             <Button
               size="small"
               danger
               icon={<Trash2 size={16} aria-hidden="true" />}
-              aria-label={`Delete product ${product.name}`}
-              title="Delete product"
+              aria-label={`Xóa sản phẩm ${product.name}`}
+              title="Xóa sản phẩm"
               disabled={isDeleting}
               loading={isDeleting && deletingId === product.id}
             />

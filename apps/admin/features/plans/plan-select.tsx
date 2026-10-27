@@ -45,13 +45,13 @@ export default function PlanSelect<T extends FieldValues>({
             action={<Button onClick={() => {
               if (plans.isError) void plans.refetch();
               if (selected.isError) void selected.refetch();
-            }}>Retry plans</Button>} />
+            }}>Tải lại gói dịch vụ</Button>} />
         </div>
       )}
       {plans.hasNextPage && (
         <Button className="mb-4" disabled={props.disabled} loading={plans.isFetchingNextPage}
           onClick={() => { if (!plans.isFetching) void plans.fetchNextPage(); }}>
-          Load more plans
+          Tải thêm gói dịch vụ
         </Button>
       )}
     </>

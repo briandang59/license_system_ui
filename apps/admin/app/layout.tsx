@@ -9,30 +9,30 @@ import { themeInitScript } from "@/lib/theme";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
 });
 
 export const metadata: Metadata = {
-  title: "License System",
-  description: "Manage your licenses, products, and customers in one workspace.",
+  title: "Hệ thống bản quyền",
+  description: "Quản lý bản quyền, sản phẩm và khách hàng trong cùng một hệ thống.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
-      lang="en"
+      lang="vi"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       // The pre-paint script only changes theme data attributes on this element.
       suppressHydrationWarning
     >
       <head><script dangerouslySetInnerHTML={{ __html: themeInitScript }} /></head>
       <body className="min-h-full flex flex-col">
-        <Suspense fallback={<p role="status">Loading...</p>}>
+        <Suspense fallback={<p role="status">Đang tải...</p>}>
           <AntdRegistry>
             <Providers>{children}</Providers>
           </AntdRegistry>

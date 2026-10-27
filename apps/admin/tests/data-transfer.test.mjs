@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import ts from "typescript";
 const require=createRequire(import.meta.url);
-function load(path,imports={}){const compiled={exports:{}};const source=ts.transpileModule(readFileSync(path,"utf8"),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText;new Function("require","module","exports",source)(name=>imports[name]??require(name),compiled,compiled.exports);return compiled.exports;}
+function load(path,imports={}){const compiled={exports:{}};const source=ts.transpileModule(readFileSync(path,"utf8"),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText;new Function("require","module","exports",source)(name=>imports[name]??(name === "@/lib/display-labels" ? load("lib/display-labels.ts") : require(name)),compiled,compiled.exports);return compiled.exports;}
 const schema=load("features/data-transfer/schema.ts");const {handleTransfer}=load("features/data-transfer/handler.ts",{"./schema":schema});const originalFetch=global.fetch;afterEach(()=>{global.fetch=originalFetch});
 const origin=process.env.APP_ORIGIN||"http://localhost:3001";
 function request(action,{cookie="access_token=test-only",from=origin,file="code,name\nAA,Example",name="input.csv",fingerprint,resource="products"}={}){
@@ -57,12 +57,12 @@ test("import dialog: changing the selected file removes confirmation; pending co
   "@hookform/resolvers/zod":{zodResolver:()=>{}},
   "@tanstack/react-query":{useQueryClient:()=>({invalidateQueries:async filter=>invalidations.push(filter)}),useMutation:options=>{const index=mutations.length;mutations.push(options);return {isPending:index%3===2&&pending,mutate:()=>{}}}},
   "@/components/form/form-upload":{default:"upload"},"@/lib/api-errors":{getApiErrorMessage:()=>"Safe error"},
-  "./service":{downloadFile:async()=>{},importFile:async()=>{},saveBlob:()=>{}},"./schema":schema,
+  "./service":{downloadFile:async()=>{},importFile:async()=>{},saveBlob:()=>{}},"./schema":schema,"./messages":load("features/data-transfer/messages.ts"),
  }).default;
  function find(node,type){if(!node||typeof node!=="object")return [];if(Array.isArray(node))return node.flatMap(n=>find(n,type));return [...(node.type===type?[node]:[]),...find(node.props?.children,type)]}
  const render=()=>{cursor=0;mutations.length=0;return Actions({resource:"products"})};
- let tree=render();let confirm=find(tree,"button").find(b=>b.props.children==="Confirm import");assert.equal(confirm.props.disabled,false);
- selected=new File(["code,name\nBB,Changed"],"input.csv");tree=render();assert.equal(find(tree,"button").some(b=>b.props.children==="Confirm import"),false);
+ let tree=render();let confirm=find(tree,"button").find(b=>b.props.children==="Xác nhận nhập");assert.equal(confirm.props.disabled,false);
+ selected=new File(["code,name\nBB,Changed"],"input.csv");tree=render();assert.equal(find(tree,"button").some(b=>b.props.children==="Xác nhận nhập"),false);
  selected=first;pending=true;tree=render();find(tree,"modal")[0].props.onCancel();assert.equal(state[0],true);assert.equal(find(tree,"modal")[0].props.closable,false);
- pending=false;render();await mutations[2].onSuccess({...report,committed:true});assert.ok(notices[0].includes("1 created"));assert.ok(invalidations.some(i=>i.queryKey[0]==="products"));tree=render();confirm=find(tree,"button").find(b=>b.props.children==="Confirm import");assert.equal(confirm.props.disabled,true);
+ pending=false;render();await mutations[2].onSuccess({...report,committed:true});assert.ok(notices[0].includes("1 tạo mới"));assert.ok(invalidations.some(i=>i.queryKey[0]==="products"));tree=render();confirm=find(tree,"button").find(b=>b.props.children==="Xác nhận nhập");assert.equal(confirm.props.disabled,true);
 });

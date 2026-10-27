@@ -1,9 +1,14 @@
 "use client";
+import viVN from "antd/locale/vi_VN";
+import dayjs from "dayjs";
+import "dayjs/locale/vi";
 
 import { createContext, useContext, useLayoutEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { App, ConfigProvider, theme } from "antd";
 import { getThemeSnapshot, getServerThemeSnapshot, subscribeTheme, type ThemePreference } from "@/lib/theme";
+
+dayjs.locale("vi");
 
 const AppearanceContext = createContext<ThemePreference>("system");
 export const useAppearance = () => useContext(AppearanceContext);
@@ -34,7 +39,7 @@ export default function Providers({ children }: { children: ReactNode }) {
   );
 
   return (
-    <ConfigProvider theme={{
+    <ConfigProvider locale={viVN} theme={{
       algorithm: dark ? theme.darkAlgorithm : theme.defaultAlgorithm,
       token: {
         colorPrimary: dark ? "#c4a0f2" : "#167047",

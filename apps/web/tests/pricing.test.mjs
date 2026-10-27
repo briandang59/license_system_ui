@@ -18,4 +18,10 @@ test("public proxy validates upstream shape and shields errors",async()=>{
  global.fetch=async()=>Response.json({error:"private SQL"},{status:500});const response=await handlePricing(new Request("http://localhost/api/pricing"));assert.equal(response.status,502);assert.equal((await response.text()).includes("private SQL"),false);
 });
 test("public pagination rejects negative offsets before fetch",async()=>{let calls=0;global.fetch=async()=>{calls++;throw Error("unexpected")};assert.equal((await handlePricing(new Request("http://localhost/api/pricing?offset=-1"))).status,400);assert.equal(calls,0)});
-test("currency amounts respect minor-unit scale and unknown currencies are explicit",()=>{assert.equal(formatMoney(2900,"USD"),"$29.00");assert.equal(formatMoney(2900,"JPY"),"¥2,900");assert.match(formatMoney(2900,"KWD"),/2\.900/);assert.equal(formatMoney(2900,"ZZZ"),"2900 ZZZ minor units");assert.equal(formatMoney(Number.MAX_SAFE_INTEGER+1,"USD"),"Price unavailable")});
+test("currency amounts use Vietnamese formatting and preserve each currency minor-unit scale",()=>{
+ assert.equal(formatMoney(2900,"USD"),new Intl.NumberFormat("vi-VN",{style:"currency",currency:"USD"}).format(29));
+ assert.equal(formatMoney(2900,"JPY"),new Intl.NumberFormat("vi-VN",{style:"currency",currency:"JPY"}).format(2900));
+ assert.match(formatMoney(2900,"KWD"),/2,900/);
+ assert.equal(formatMoney(2900,"ZZZ"),"2900 ZZZ đơn vị nhỏ nhất");
+ assert.equal(formatMoney(Number.MAX_SAFE_INTEGER+1,"USD"),"Chưa có giá");
+});

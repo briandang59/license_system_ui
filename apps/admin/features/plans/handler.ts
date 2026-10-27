@@ -1,23 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+z.config(z.locales.vi());
 import {
   planInputSchema,
   planUpdateSchema,
   planSchema,
   planListSchema,
   planFeatureInputSchema,
+  planFeatureUpdateSchema,
   planFeatureSchema,
   planFeatureListSchema,
 } from "@/features/plans/schema";
 
 function failure(status: number, code: string) {
   return NextResponse.json(
-    { success: false, error: { code, message: "Plan request failed." } },
+    { success: false, error: { code, message: "Không thể thực hiện yêu cầu về gói dịch vụ." } },
     { status, headers: { "Cache-Control": "no-store" } },
   );
 }
 
-export async function handlePlan(request: Request, id?: string, resource?: "features") {
+export async function handlePlan(request: Request, id?: string, resource?: "features", featureId?: string) {
   const method = request.method;
   if (
     method !== "GET" &&
@@ -32,12 +34,14 @@ export async function handlePlan(request: Request, id?: string, resource?: "feat
   if (id !== undefined && (!/^[1-9]\d*$/.test(id) || !Number.isSafeInteger(Number(id))))
     return failure(400, "VALIDATION_ERROR");
   if (resource && !id) return failure(400, "VALIDATION_ERROR");
-  if (!(id && !resource ? ["GET", "PATCH", "DELETE"] : ["GET", "POST"]).includes(method))
+  if (featureId !== undefined && (!resource || !/^[1-9]\d*$/.test(featureId) || !Number.isSafeInteger(Number(featureId))))
+    return failure(400, "VALIDATION_ERROR");
+  if (!(featureId ? ["PATCH"] : id && !resource ? ["GET", "PATCH", "DELETE"] : ["GET", "POST"]).includes(method))
     return failure(405, "METHOD_NOT_ALLOWED");
   let body;
   if (method === "POST" || method === "PATCH") {
     const parsed = (
-      resource ? planFeatureInputSchema : method === "POST" ? planInputSchema : planUpdateSchema
+      featureId ? planFeatureUpdateSchema : resource ? planFeatureInputSchema : method === "POST" ? planInputSchema : planUpdateSchema
     ).safeParse(await request.json().catch(() => null));
     if (!parsed.success) return failure(400, "VALIDATION_ERROR");
     body = parsed.data;
@@ -49,8 +53,15 @@ export async function handlePlan(request: Request, id?: string, resource?: "feat
   const search = params.get("search")?.trim() ?? "";
   const query = new URLSearchParams({ limit: "20", offset });
   if (method === "GET" && search) query.set("search", search);
+  const include = params.get("include");
+  if (include !== null) {
+    const paths = include.split(",").map(value => value.trim());
+    if (resource || id || paths.some(value => !["features", "product"].includes(value)))
+      return failure(400, "VALIDATION_ERROR");
+    query.set("include", [...new Set(paths)].join(","));
+  }
   const path = resource
-    ? `/plans/${id}/features${method === "GET" ? `?${new URLSearchParams({ limit: "20", offset })}` : ""}`
+    ? `/plans/${id}/features${featureId ? `/${featureId}` : method === "GET" ? `?${new URLSearchParams({ limit: "20", offset })}` : ""}`
     : id ? `/plans/${id}` : `/plans?${query}`;
   try {
     const response = await fetch(
@@ -89,6 +100,19 @@ export async function handlePlan(request: Request, id?: string, resource?: "feat
       })
       .safeParse(json);
     if (!result.success) return failure(502, "INVALID_RESPONSE");
+    if (featureId) {
+      const item = planFeatureSchema.safeParse(result.data.data);
+      if (!item.success || item.data.plan_id !== Number(id) || item.data.feature_id !== Number(featureId))
+        return failure(502, "INVALID_RESPONSE");
+    }
+    if (method === "GET" && !id && include !== null) {
+      const list = planListSchema.safeParse(result.data.data);
+      const paths = include.split(",").map(value => value.trim());
+      if (!list.success || list.data.items.some(plan =>
+        (paths.includes("features") && plan.features === undefined) ||
+        (paths.includes("product") && plan.product === undefined)))
+        return failure(502, "INVALID_RESPONSE");
+    }
     return NextResponse.json(result.data, {
       status: response.status,
       headers: { "Cache-Control": "no-store" },

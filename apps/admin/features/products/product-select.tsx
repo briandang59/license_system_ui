@@ -45,13 +45,13 @@ export default function ProductSelect<T extends FieldValues>({
             action={<Button onClick={() => {
               if (products.isError) void products.refetch();
               if (selected.isError) void selected.refetch();
-            }}>Retry products</Button>} />
+            }}>Tải lại sản phẩm</Button>} />
         </div>
       )}
       {products.hasNextPage && (
         <Button className="mb-4" disabled={props.disabled} loading={products.isFetchingNextPage}
           onClick={() => { if (!products.isFetching) void products.fetchNextPage(); }}>
-          Load more products
+          Tải thêm sản phẩm
         </Button>
       )}
     </>

@@ -23,8 +23,8 @@ export default function FeaturePicker({
   const [offset, setOffset] = useState(0);
   const [search, setSearch] = useState("");
   const features = useQuery({
-    queryKey: ["features", "list", offset, search],
-    queryFn: ({ signal }) => featureService.getAll(offset, signal, search),
+    queryKey: ["features", "product", productId, offset, search],
+    queryFn: ({ signal }) => featureService.getForProduct(productId, offset, signal, search),
   });
 
   function changePage(next: number) {
@@ -36,19 +36,19 @@ export default function FeaturePicker({
     <>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <Input.Search
-          aria-label="Search features" placeholder="Search features by name or code" allowClear
+          aria-label="Tìm tính năng" placeholder="Tìm tính năng theo tên hoặc mã" allowClear
           disabled={disabled} style={{ maxWidth: 420 }}
-          enterButton={<Button aria-label="Search features" title="Search features" icon={<Search size={16} aria-hidden="true" />} />}
+          enterButton={<Button aria-label="Tìm tính năng" title="Tìm tính năng" icon={<Search size={16} aria-hidden="true" />} />}
           onSearch={(value, event) => { event?.preventDefault(); setSearch(value.trim()); changePage(0); }}
         />
         <span className={`rounded-md px-3 py-1.5 text-xs font-medium ${selectedIds.length ? "bg-accent-soft text-accent" : "bg-surface-subtle text-muted"}`} aria-live="polite">
-          {selectedIds.length} selected
+          {selectedIds.length} đã chọn
         </span>
       </div>
       {features.isError && (
         <div role="alert" className="mb-4">
           <Alert type="error" title={getApiErrorMessage(features.error)}
-            action={<Button icon={<RotateCw size={16} aria-hidden="true" />} onClick={() => void features.refetch()}>Retry</Button>} />
+            action={<Button icon={<RotateCw size={16} aria-hidden="true" />} onClick={() => void features.refetch()}>Thử lại</Button>} />
         </div>
       )}
       <div className="overflow-hidden rounded-lg border border-line">
@@ -60,38 +60,37 @@ export default function FeaturePicker({
           onChange: (_, rows) => onChange(rows),
           getCheckboxProps: (feature) => ({
             disabled: disabled || features.isFetching || features.isError || feature.product_id !== productId || assignedFeatureIds.includes(feature.id),
-            "aria-label": `Select feature ${feature.name}`,
+            "aria-label": `Chọn tính năng ${feature.name}`,
           }),
         }}
         columns={[
           { title: "#", key: "index", width: 50, render: (_, __, index) => <span className="text-muted">{offset + index + 1}</span> },
-          { title: "Feature", key: "feature", width: 260, render: (_, feature) => <div className="min-w-0 py-1">
+          { title: "Tính năng", key: "feature", width: 260, render: (_, feature) => <div className="min-w-0 py-1">
             <div className="font-medium text-foreground wrap-anywhere">{feature.name}</div>
             <div className="mt-1 text-xs text-muted wrap-anywhere">{feature.code}</div>
           </div> },
-          { title: "Type", dataIndex: "feature_type", width: 115, render: (type: Feature["feature_type"]) =>
+          { title: "Loại", dataIndex: "feature_type", width: 115, render: (type: Feature["feature_type"]) =>
             <span className="text-xs text-muted">
-              {type === "quantity" ? "Quantity" : type === "unlimited" ? "Unlimited" : "Boolean"}
+              {type === "quantity" ? "Số lượng" : type === "unlimited" ? "Không giới hạn" : "Bật/tắt"}
             </span>,
           },
-          { title: "Configuration", key: "configuration", width: 310, render: (_, feature) => renderConfiguration(feature) },
-          { title: "Status", key: "availability", width: 150, render: (_, feature) =>
-            assignedFeatureIds.includes(feature.id) ? <Tag>Already added</Tag>
-              : feature.product_id !== productId ? <Tag title="Only features from the plan's product can be added.">Different product</Tag>
-                : <span className="text-xs text-positive">Available</span>,
+          { title: "Cấu hình", key: "configuration", width: 310, render: (_, feature) => renderConfiguration(feature) },
+          { title: "Trạng thái", key: "availability", width: 150, render: (_, feature) =>
+            assignedFeatureIds.includes(feature.id) ? <Tag>Đã thêm</Tag>
+              : <span className="text-xs text-positive">Có thể thêm</span>,
           },
         ]}
       />
       </div>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-        <span className="text-xs text-muted">Only features from this plan’s product can be added.</span>
+        <span className="text-xs text-muted">Chỉ có thể thêm tính năng thuộc sản phẩm của gói này.</span>
         <div className="flex items-center gap-2">
         <Button size="small" icon={<ChevronLeft size={14} aria-hidden="true" />} disabled={disabled || offset === 0 || features.isFetching}
-          onClick={() => changePage(offset - 20)}>Previous</Button>
-        <span className="px-2 text-xs text-muted">Page {offset / 20 + 1}</span>
+          onClick={() => changePage(offset - 20)}>Trước</Button>
+        <span className="px-2 text-xs text-muted">Trang {offset / 20 + 1}</span>
         <Button size="small" icon={<ChevronRight size={14} aria-hidden="true" />}
-          disabled={disabled || features.isFetching || features.isError || (features.data?.items.length ?? 0) < 20}
-          onClick={() => changePage(offset + 20)}>Next</Button>
+          disabled={disabled || features.isFetching || features.isError || !features.data?.hasMore}
+          onClick={() => changePage(offset + 20)}>Tiếp</Button>
         </div>
       </div>
     </>

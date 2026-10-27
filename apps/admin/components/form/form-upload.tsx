@@ -19,7 +19,7 @@ export default function FormUpload<T extends FieldValues>({ control, name, label
           onChange={({ fileList }) => field.onChange(fileList)}
         >
           <span onBlur={field.onBlur}>
-            {children ?? <Button {...a11y} ref={field.ref} disabled={field.disabled}>Choose files</Button>}
+            {children ?? <Button {...a11y} ref={field.ref} disabled={field.disabled}>Chọn tệp</Button>}
           </span>
         </Upload>
       )}

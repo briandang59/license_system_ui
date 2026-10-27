@@ -24,6 +24,7 @@ import { getApiErrorMessage } from "@/lib/api-errors";
 import { getPlanColumns } from "@/features/plans/columns";
 import { getPlanDescriptionItems } from "@/features/plans/descriptions";
 import PlanFeaturesModal from "@/features/plans/plan-features-modal";
+import IncludedFeatures from "@/features/plans/included-features";
 
 export default function PlansPage() {
   const { message } = App.useApp();
@@ -50,7 +51,7 @@ export default function PlansPage() {
     mutationFn: planService.remove,
     onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: async () => {
-      void message.success("Plan deleted.");
+      void message.success("Đã xóa gói dịch vụ.");
       setSelectedRowKeys([]);
       if (plans.data?.items.length === 1 && offset > 0)
         setOffset(offset - 20);
@@ -62,13 +63,13 @@ export default function PlansPage() {
     <div>
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Plans</h1>
+          <h1 className="text-2xl font-semibold">Gói dịch vụ</h1>
           <p className="mt-2 text-sm text-muted">
-            Create and manage your plans.
+            Xem tính năng và hạn mức của từng gói. Mở rộng một dòng để xem toàn bộ quyền lợi đã cấu hình.
           </p>
         </div>
         <Button type="primary" icon={<Plus size={16} aria-hidden="true" />} onClick={() => setDialog({ mode: "create" })}>
-          Add plan
+          Thêm gói dịch vụ
         </Button>
       </div>
       {plans.isError && (
@@ -83,7 +84,7 @@ export default function PlansPage() {
                   void plans.refetch();
                 }}
               >
-                Retry
+                Thử lại
               </Button>
             }
           />
@@ -91,18 +92,18 @@ export default function PlansPage() {
       )}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <Input.Search
-          aria-label="Search plans"
-          placeholder="Search name or code"
+          aria-label="Tìm gói dịch vụ"
+          placeholder="Tìm theo tên hoặc mã"
           allowClear
           style={{ maxWidth: 420 }}
-          enterButton={<Button aria-label="Search plans" title="Search plans" icon={<Search size={16} aria-hidden="true" />} />}
+          enterButton={<Button aria-label="Tìm gói dịch vụ" title="Tìm gói dịch vụ" icon={<Search size={16} aria-hidden="true" />} />}
           onSearch={(value) => {
             setSearch(value.trim());
             setOffset(0);
             setSelectedRowKeys([]);
           }}
         />
-        <div className="flex flex-wrap items-center gap-3"><DataTransferActions resource="plans" filters={{search}} /><span className="text-sm text-muted" aria-live="polite">{selectedRowKeys.length} selected</span></div>
+        <div className="flex flex-wrap items-center gap-3"><DataTransferActions resource="plans" filters={{search}} /><span className="text-sm text-muted" aria-live="polite">{selectedRowKeys.length} đã chọn</span></div>
       </div>
       <Table<Plan>
         rowKey="id"
@@ -114,7 +115,12 @@ export default function PlansPage() {
         loading={plans.isFetching}
         dataSource={plans.data?.items ?? []}
         pagination={false}
-        scroll={{ x: 700 }}
+        scroll={{ x: 1100 }}
+        expandable={{
+          expandedRowRender: plan => <section aria-label={`Tính năng trong gói ${plan.name}`} className="p-2"><IncludedFeatures plan={plan} /></section>,
+          rowExpandable: plan => plan.features !== undefined && plan.features.length > 0,
+          columnTitle: "Chi tiết",
+        }}
         columns={getPlanColumns({
           offset,
           onAddFeatures: setFeaturePlan,
@@ -131,9 +137,9 @@ export default function PlansPage() {
           disabled={offset === 0 || plans.isFetching}
           onClick={() => { setOffset(offset - 20); setSelectedRowKeys([]); }}
         >
-          Previous
+          Trước
         </Button>
-        <span className="text-sm text-muted">Page {offset / 20 + 1}</span>
+        <span className="text-sm text-muted">Trang {offset / 20 + 1}</span>
         <Button
           icon={<ChevronRight size={16} aria-hidden="true" />}
           disabled={
@@ -143,18 +149,19 @@ export default function PlansPage() {
           }
           onClick={() => { setOffset(offset + 20); setSelectedRowKeys([]); }}
         >
-          Next
+          Tiếp
         </Button>
       </div>
       <Modal
         title={
           dialog?.mode === "create"
-            ? "Add plan"
+            ? "Thêm gói dịch vụ"
             : dialog?.mode === "edit"
-              ? "Edit plan"
-              : "Plan details"
+              ? "Sửa gói dịch vụ"
+              : "Chi tiết gói dịch vụ"
         }
         open={!!dialog}
+        width={dialog?.mode === "view" ? 960 : 560}
         onCancel={() => setDialog(null)}
         footer={null}
         destroyOnHidden
@@ -162,14 +169,14 @@ export default function PlansPage() {
         {dialog?.mode === "create" ? (
           <PlanForm onSaved={() => setDialog(null)} />
         ) : detail.isPending ? (
-          <Spin aria-label="Loading plan" />
+          <Spin aria-label="Đang tải gói dịch vụ" />
         ) : detail.isError ? (
           <div role="alert">
             <Alert
               type="error"
               title={getApiErrorMessage(detail.error)}
               action={
-                <Button icon={<RotateCw size={16} aria-hidden="true" />} onClick={() => void detail.refetch()}>Retry</Button>
+                <Button icon={<RotateCw size={16} aria-hidden="true" />} onClick={() => void detail.refetch()}>Thử lại</Button>
               }
             />
           </div>
@@ -182,11 +189,16 @@ export default function PlansPage() {
               onSaved={() => setDialog(null)}
             />
           ) : (
-            <><Descriptions column={1} items={getPlanDescriptionItems(detail.data)} /><PricingPanel kind="plans" parent={detail.data.id} name={detail.data.name} /></>
+            <><Descriptions column={1} items={getPlanDescriptionItems(detail.data)} />
+              <section className="mt-6 border-t border-line pt-5">
+                <h3 className="mb-3 text-lg font-semibold">Tính năng trong gói</h3>
+                <IncludedFeatures plan={plans.data?.items.find(plan => plan.id === detail.data.id) ?? detail.data} />
+              </section>
+              <PricingPanel kind="plans" parent={detail.data.id} name={detail.data.name} /></>
           ))
         )}
       </Modal>
-      {featurePlan && <PlanFeaturesModal key={featurePlan.id} plan={featurePlan} onClose={() => setFeaturePlan(null)} />}
+      {featurePlan && <PlanFeaturesModal key={featurePlan.id} plan={plans.data?.items.find(plan => plan.id === featurePlan.id) ?? featurePlan} onClose={() => setFeaturePlan(null)} />}
     </div>
   );
 }

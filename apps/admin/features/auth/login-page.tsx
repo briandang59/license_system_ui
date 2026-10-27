@@ -24,7 +24,7 @@ export default function LoginPage() {
     gcTime: 0,
     onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: () => {
-      void message.success("Signed in.");
+      void message.success("Đăng nhập thành công.");
       queryClient.clear();
       resetField("password");
       router.replace("/");
@@ -35,10 +35,10 @@ export default function LoginPage() {
   return (
     <div>
           <h1 className="text-3xl font-semibold tracking-tight">
-            Welcome back
+            Chào mừng trở lại
           </h1>
           <p className="mt-2 text-sm text-muted">
-            Sign in to manage your licenses.
+            Đăng nhập để quản lý bản quyền của bạn.
           </p>
           <form
             className="mt-8"
@@ -50,7 +50,7 @@ export default function LoginPage() {
             <FormInput
               control={control}
               name="email"
-              label="Email address"
+              label="Địa chỉ email"
               type="email"
               autoComplete="username"
               placeholder="you@example.com"
@@ -59,10 +59,10 @@ export default function LoginPage() {
             <FormInput
               control={control}
               name="password"
-              label="Password"
+              label="Mật khẩu"
               type="password"
               autoComplete="current-password"
-              placeholder="Enter your password"
+              placeholder="Nhập mật khẩu"
               size="large"
             />
             <Button
@@ -72,10 +72,10 @@ export default function LoginPage() {
               size="large"
               loading={login.isPending}
             >
-              {login.isPending ? "Signing in..." : "Sign in"}
+              {login.isPending ? "Đang đăng nhập..." : "Đăng nhập"}
             </Button>
             <p role="status" className="sr-only">
-              {login.isPending ? "Signing in. Please wait." : ""}
+              {login.isPending ? "Đang đăng nhập. Vui lòng chờ." : ""}
             </p>
           </form>
     </div>

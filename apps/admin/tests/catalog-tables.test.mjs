@@ -11,7 +11,7 @@ function load(path, imports = {}) {
   }).outputText;
   const compiled = { exports: {} };
   new Function("require", "module", "exports", source)(
-    (name) => imports[name] ?? (["@/features/pricing/panel", "@/features/units/unit-label", "@/features/data-transfer/actions"].includes(name) ? (() => null) : require(name)), compiled, compiled.exports,
+    (name) => imports[name] ?? (["@/features/pricing/panel", "@/features/units/unit-label", "@/features/plans/included-features", "@/features/data-transfer/actions"].includes(name) ? (() => null) : (name === "@/lib/display-labels" ? load("lib/display-labels.ts") : require(name))), compiled, compiled.exports,
   );
   return compiled.exports;
 }
@@ -148,7 +148,7 @@ for (const [name, plural] of [["product", "products"], ["company", "companies"],
     table().props.rowSelection.onChange([88]);
     tree = render();
     assert.deepEqual(table().props.rowSelection.selectedRowKeys, [88]);
-    find(tree, "button").find((button) => button.props.children === "Next").props.onClick();
+    find(tree, "button").find((button) => button.props.children === "Tiếp").props.onClick();
     tree = render();
     assert.equal(state[0], 20);
     assert.deepEqual(table().props.rowSelection.selectedRowKeys, []);
@@ -156,7 +156,8 @@ for (const [name, plural] of [["product", "products"], ["company", "companies"],
     tree = render();
     await mutation.onSuccess();
     assert.deepEqual(state[2], []);
-    assert.ok(calls.some((call) => call[0] === "success" && call[1] === `${cap} deleted.`));
+    const entityLabel = { product: "sản phẩm", company: "doanh nghiệp", plan: "gói dịch vụ", feature: "tính năng" }[name];
+    assert.ok(calls.some((call) => call[0] === "success" && call[1] === `Đã xóa ${entityLabel}.`));
     assert.deepEqual(calls.at(-1), ["invalidate", { queryKey: [plural] }]);
     mutation.onError(new Error("secret"));
     assert.deepEqual(calls.at(-1), ["error", "Request failed"]);

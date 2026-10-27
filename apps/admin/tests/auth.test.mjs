@@ -135,7 +135,7 @@ test("logout waits for query cancellation before clearing cache and navigating",
   assert.deepEqual(calls, ["cancel"]);
   completeCancellation();
   await completion;
-  assert.deepEqual(calls, ["cancel", "clear", "Signed out.", "/auth/login", "refresh"]);
+  assert.deepEqual(calls, ["cancel", "clear", "Đăng xuất thành công.", "/auth/login", "refresh"]);
   mutation.onError(new Error("secret"));
   assert.equal(calls.at(-1), "Safe logout error");
 });
@@ -150,9 +150,9 @@ test("shared Ant Design input renders password fields and marks invalid fields",
   function Example() {
     const { control } = useForm({
       defaultValues: { password: "" },
-      errors: { password: { type: "required", message: "Enter your password." } },
+      errors: { password: { type: "required", message: "Vui lòng nhập mật khẩu." } },
     });
-    return createElement(FormInput, { control, name: "password", label: "Password", type: "password" });
+    return createElement(FormInput, { control, name: "password", label: "Mật khẩu", type: "password" });
   }
   const html = renderToStaticMarkup(createElement(Example));
   assert.match(html, /type="password"/);

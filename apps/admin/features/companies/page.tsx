@@ -47,7 +47,7 @@ export default function CompaniesPage() {
     mutationFn: companyService.remove,
     onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: async () => {
-      void message.success("Company deleted.");
+      void message.success("Đã xóa doanh nghiệp.");
       setSelectedRowKeys([]);
       if (companies.data?.items.length === 1 && offset > 0)
         setOffset(offset - 20);
@@ -59,13 +59,13 @@ export default function CompaniesPage() {
     <div>
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Companies</h1>
+          <h1 className="text-2xl font-semibold">Doanh nghiệp</h1>
           <p className="mt-2 text-sm text-muted">
-            Create and manage your companies.
+            Tạo và quản lý doanh nghiệp.
           </p>
         </div>
         <Button type="primary" icon={<Plus size={16} aria-hidden="true" />} onClick={() => setDialog({ mode: "create" })}>
-          Add company
+          Thêm doanh nghiệp
         </Button>
       </div>
       {companies.isError && (
@@ -80,7 +80,7 @@ export default function CompaniesPage() {
                   void companies.refetch();
                 }}
               >
-                Retry
+                Thử lại
               </Button>
             }
           />
@@ -88,18 +88,18 @@ export default function CompaniesPage() {
       )}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <Input.Search
-          aria-label="Search companies"
-          placeholder="Search name, code, tax code, email or phone"
+          aria-label="Tìm doanh nghiệp"
+          placeholder="Tìm theo tên, mã, mã số thuế, email hoặc số điện thoại"
           allowClear
           style={{ maxWidth: 420 }}
-          enterButton={<Button aria-label="Search companies" title="Search companies" icon={<Search size={16} aria-hidden="true" />} />}
+          enterButton={<Button aria-label="Tìm doanh nghiệp" title="Tìm doanh nghiệp" icon={<Search size={16} aria-hidden="true" />} />}
           onSearch={(value) => {
             setSearch(value.trim());
             setOffset(0);
             setSelectedRowKeys([]);
           }}
         />
-        <div className="flex flex-wrap items-center gap-3"><DataTransferActions resource="companies" filters={{search}} /><span className="text-sm text-muted" aria-live="polite">{selectedRowKeys.length} selected</span></div>
+        <div className="flex flex-wrap items-center gap-3"><DataTransferActions resource="companies" filters={{search}} /><span className="text-sm text-muted" aria-live="polite">{selectedRowKeys.length} đã chọn</span></div>
       </div>
       <Table<Company>
         rowKey="id"
@@ -127,9 +127,9 @@ export default function CompaniesPage() {
           disabled={offset === 0 || companies.isFetching}
           onClick={() => { setOffset(offset - 20); setSelectedRowKeys([]); }}
         >
-          Previous
+          Trước
         </Button>
-        <span className="text-sm text-muted">Page {offset / 20 + 1}</span>
+        <span className="text-sm text-muted">Trang {offset / 20 + 1}</span>
         <Button
           icon={<ChevronRight size={16} aria-hidden="true" />}
           disabled={
@@ -139,16 +139,16 @@ export default function CompaniesPage() {
           }
           onClick={() => { setOffset(offset + 20); setSelectedRowKeys([]); }}
         >
-          Next
+          Tiếp
         </Button>
       </div>
       <Modal
         title={
           dialog?.mode === "create"
-            ? "Add company"
+            ? "Thêm doanh nghiệp"
             : dialog?.mode === "edit"
-              ? "Edit company"
-              : "Company details"
+              ? "Sửa doanh nghiệp"
+              : "Chi tiết doanh nghiệp"
         }
         open={!!dialog}
         onCancel={() => setDialog(null)}
@@ -158,14 +158,14 @@ export default function CompaniesPage() {
         {dialog?.mode === "create" ? (
           <CompanyForm onSaved={() => setDialog(null)} />
         ) : detail.isPending ? (
-          <Spin aria-label="Loading company" />
+          <Spin aria-label="Đang tải doanh nghiệp" />
         ) : detail.isError ? (
           <div role="alert">
             <Alert
               type="error"
               title={getApiErrorMessage(detail.error)}
               action={
-                <Button icon={<RotateCw size={16} aria-hidden="true" />} onClick={() => void detail.refetch()}>Retry</Button>
+                <Button icon={<RotateCw size={16} aria-hidden="true" />} onClick={() => void detail.refetch()}>Thử lại</Button>
               }
             />
           </div>

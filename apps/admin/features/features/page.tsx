@@ -48,7 +48,7 @@ export default function FeaturesPage() {
     mutationFn: featureService.remove,
     onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: async () => {
-      void message.success("Feature deleted.");
+      void message.success("Đã xóa tính năng.");
       setSelectedRowKeys([]);
       if (features.data?.items.length === 1 && offset > 0)
         setOffset(offset - 20);
@@ -60,13 +60,13 @@ export default function FeaturesPage() {
     <div>
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Features</h1>
+          <h1 className="text-2xl font-semibold">Tính năng</h1>
           <p className="mt-2 text-sm text-muted">
-            Create and manage your features.
+            Tạo và quản lý tính năng.
           </p>
         </div>
         <Button type="primary" icon={<Plus size={16} aria-hidden="true" />} onClick={() => setDialog({ mode: "create" })}>
-          Add feature
+          Thêm tính năng
         </Button>
       </div>
       {features.isError && (
@@ -81,7 +81,7 @@ export default function FeaturesPage() {
                   void features.refetch();
                 }}
               >
-                Retry
+                Thử lại
               </Button>
             }
           />
@@ -89,18 +89,18 @@ export default function FeaturesPage() {
       )}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <Input.Search
-          aria-label="Search features"
-          placeholder="Search name or code"
+          aria-label="Tìm tính năng"
+          placeholder="Tìm theo tên hoặc mã"
           allowClear
           style={{ maxWidth: 420 }}
-          enterButton={<Button aria-label="Search features" title="Search features" icon={<Search size={16} aria-hidden="true" />} />}
+          enterButton={<Button aria-label="Tìm tính năng" title="Tìm tính năng" icon={<Search size={16} aria-hidden="true" />} />}
           onSearch={(value) => {
             setSearch(value.trim());
             setOffset(0);
             setSelectedRowKeys([]);
           }}
         />
-        <div className="flex flex-wrap items-center gap-3"><DataTransferActions resource="features" filters={{search}} /><span className="text-sm text-muted" aria-live="polite">{selectedRowKeys.length} selected</span></div>
+        <div className="flex flex-wrap items-center gap-3"><DataTransferActions resource="features" filters={{search}} /><span className="text-sm text-muted" aria-live="polite">{selectedRowKeys.length} đã chọn</span></div>
       </div>
       <Table<Feature>
         rowKey="id"
@@ -128,9 +128,9 @@ export default function FeaturesPage() {
           disabled={offset === 0 || features.isFetching}
           onClick={() => { setOffset(offset - 20); setSelectedRowKeys([]); }}
         >
-          Previous
+          Trước
         </Button>
-        <span className="text-sm text-muted">Page {offset / 20 + 1}</span>
+        <span className="text-sm text-muted">Trang {offset / 20 + 1}</span>
         <Button
           icon={<ChevronRight size={16} aria-hidden="true" />}
           disabled={
@@ -140,16 +140,16 @@ export default function FeaturesPage() {
           }
           onClick={() => { setOffset(offset + 20); setSelectedRowKeys([]); }}
         >
-          Next
+          Tiếp
         </Button>
       </div>
       <Modal
         title={
           dialog?.mode === "create"
-            ? "Add feature"
+            ? "Thêm tính năng"
             : dialog?.mode === "edit"
-              ? "Edit feature"
-              : "Feature details"
+              ? "Sửa tính năng"
+              : "Chi tiết tính năng"
         }
         open={!!dialog}
         onCancel={() => setDialog(null)}
@@ -159,14 +159,14 @@ export default function FeaturesPage() {
         {dialog?.mode === "create" ? (
           <FeatureForm onSaved={() => setDialog(null)} />
         ) : detail.isPending ? (
-          <Spin aria-label="Loading feature" />
+          <Spin aria-label="Đang tải tính năng" />
         ) : detail.isError ? (
           <div role="alert">
             <Alert
               type="error"
               title={getApiErrorMessage(detail.error)}
               action={
-                <Button icon={<RotateCw size={16} aria-hidden="true" />} onClick={() => void detail.refetch()}>Retry</Button>
+                <Button icon={<RotateCw size={16} aria-hidden="true" />} onClick={() => void detail.refetch()}>Thử lại</Button>
               }
             />
           </div>

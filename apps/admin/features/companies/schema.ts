@@ -1,4 +1,5 @@
 import { z } from "zod";
+z.config(z.locales.vi());
 
 export const companyInputSchema = z.strictObject({
   code: z.string().trim().min(2).max(50),
@@ -14,7 +15,7 @@ export const companyUpdateSchema = companyInputSchema.extend({
   status: companyInputSchema.shape.status.nullable(),
 }).partial().refine(
   (data) => Object.entries(data).some(([key, value]) => value !== undefined && (value !== null || ["tax_code", "email", "phone"].includes(key))),
-  { message: "Provide at least one field to update." },
+  { message: "Cung cấp ít nhất một trường cần cập nhật." },
 );
 
 export const companyFormSchema = companyInputSchema.extend({

@@ -36,22 +36,22 @@ export function CompanyForm({ company, onSaved }: { company?: Company; onSaved: 
     },
     onError: (error) => { void message.error(getApiErrorMessage(error)); },
     onSuccess: async () => {
-      void message.success(company ? "Company updated." : "Company created.");
+      void message.success(company ? "Đã cập nhật doanh nghiệp." : "Đã tạo doanh nghiệp.");
       await queryClient.invalidateQueries({ queryKey: ["companies"] });
       onSaved();
     },
   });
   return (
     <form noValidate onSubmit={handleSubmit((data) => { if (!save.isPending) save.mutate(data); })}>
-      <FormInput control={control} name="code" label="Code" disabled={save.isPending} />
-      <FormInput control={control} name="name" label="Name" disabled={save.isPending} />
-      <FormInput control={control} name="tax_code" label="Tax code" disabled={save.isPending} />
+      <FormInput control={control} name="code" label="Mã" disabled={save.isPending} />
+      <FormInput control={control} name="name" label="Tên" disabled={save.isPending} />
+      <FormInput control={control} name="tax_code" label="Mã số thuế" disabled={save.isPending} />
       <FormInput control={control} name="email" label="Email" disabled={save.isPending} />
-      <FormInput control={control} name="phone" label="Phone" disabled={save.isPending} />
-      <FormSelect control={control} name="status" label="Status" disabled={save.isPending}
-        options={[{ value: "active", label: "Active" }, { value: "inactive", label: "Inactive" }]} />
+      <FormInput control={control} name="phone" label="Số điện thoại" disabled={save.isPending} />
+      <FormSelect control={control} name="status" label="Trạng thái" disabled={save.isPending}
+        options={[{ value: "active", label: "Hoạt động" }, { value: "inactive", label: "Ngừng hoạt động" }]} />
       <Button htmlType="submit" type="primary" loading={save.isPending} block>
-        {company ? "Save changes" : "Create company"}
+        {company ? "Lưu thay đổi" : "Tạo doanh nghiệp"}
       </Button>
     </form>
   );

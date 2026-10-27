@@ -7,3 +7,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Ngôn ngữ giao diện
+
+Tuân thủ quy tắc tiếng Việt tại AGENTS.md ở root: toàn bộ nội dung hiển thị và trợ năng
+phải dùng tiếng Việt; locale vi_VN/vi-VN và lang="vi". Giữ nguyên khóa/enum/API/code dữ liệu.

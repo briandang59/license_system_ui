@@ -1,4 +1,5 @@
 import { z } from "zod";
+z.config(z.locales.vi());
 
 export const planInputSchema = z.strictObject({
   product_id: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
@@ -12,7 +13,7 @@ export const planUpdateSchema = planInputSchema.omit({ code: true, product_id: t
   status: planInputSchema.shape.status.nullable(),
 }).partial().refine(
   (data) => Object.entries(data).some(([key, value]) => value !== undefined && (value !== null || ["description"].includes(key))),
-  { message: "Provide at least one field to update." },
+  { message: "Cung cấp ít nhất một trường cần cập nhật." },
 );
 
 export const planFormSchema = planInputSchema.extend({
@@ -20,7 +21,20 @@ export const planFormSchema = planInputSchema.extend({
   status: z.enum(["active", "inactive"]),
 });
 
+export const includedPlanFeatureSchema = z.object({
+  feature_id: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+  code: z.string(),
+  name: z.string(),
+  feature_type: z.enum(["boolean", "quantity", "unlimited"]),
+  unit: z.string().nullable(),
+  unit_id: z.number().int().positive().max(Number.MAX_SAFE_INTEGER).nullable(),
+  enabled: z.boolean(),
+  limit_value: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER).nullable(),
+});
+
 export const planSchema = z.object({
+  features: z.array(includedPlanFeatureSchema).optional(),
+  product: z.object({ id: z.number().int().positive().max(Number.MAX_SAFE_INTEGER), code: z.string(), name: z.string() }).optional(),
   id: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
   product_id: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
   code: z.string().trim().min(2).max(100),
@@ -46,6 +60,11 @@ export const planFeatureInputSchema = z.strictObject({
   enabled: z.boolean().optional(),
   limit_value: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER).nullable().optional(),
 });
+export const planFeatureUpdateSchema = planFeatureInputSchema.omit({ feature_id: true })
+  .refine(data => data.enabled !== undefined || data.limit_value !== undefined, { message: "Cung cấp ít nhất một thay đổi." });
+export const planFeatureEditSchema = planFeatureInputSchema.omit({ feature_id: true }).required();
+export type PlanFeatureUpdate = z.infer<typeof planFeatureUpdateSchema>;
+export type PlanFeatureEdit = z.infer<typeof planFeatureEditSchema>;
 export const planFeatureSchema = planFeatureInputSchema.extend({
   enabled: z.boolean(),
   limit_value: planFeatureInputSchema.shape.limit_value.unwrap(),
