@@ -11,7 +11,7 @@ function load(path, imports = {}) {
   }).outputText;
   const compiled = { exports: {} };
   new Function("require", "module", "exports", source)(
-    (name) => imports[name] ?? (["@/features/pricing/panel", "@/features/units/unit-label"].includes(name) ? (() => null) : require(name)), compiled, compiled.exports,
+    (name) => imports[name] ?? (["@/features/pricing/panel", "@/features/units/unit-label", "@/features/data-transfer/actions"].includes(name) ? (() => null) : require(name)), compiled, compiled.exports,
   );
   return compiled.exports;
 }

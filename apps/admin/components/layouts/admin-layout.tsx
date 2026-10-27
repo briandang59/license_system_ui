@@ -19,6 +19,7 @@ const items = [
       { key: "/products", icon: <Package size={17} aria-hidden="true" />, label: <Link href="/products">Products</Link> },
       { key: "/companies", icon: <Building2 size={17} aria-hidden="true" />, label: <Link href="/companies">Companies</Link> },
       { key: "/plans", icon: <Layers3 size={17} aria-hidden="true" />, label: <Link href="/plans">Plans</Link> },
+      { key: "/data-transfer", label: <Link href="/data-transfer">Import & export</Link> },
       { key: "/units", label: <Link href="/units">Units</Link> },
       { key: "/subscriptions", label: <Link href="/subscriptions">Subscriptions</Link> },
       { key: "/features", icon: <Puzzle size={17} aria-hidden="true" />, label: <Link href="/features">Features</Link> },

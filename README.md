@@ -1,5 +1,9 @@
 # License System frontend
 
+Admin có Import & export tại `/data-transfer`, hỗ trợ CSV/XLSX upsert cho catalog,
+Plan Features và bảng giá; export CSV cho các nhóm nghiệp vụ, gồm Subscription và
+License. Xem [Data transfer — 20261027](docs/20261027_data_transfer.md).
+
 Hai Next.js app độc lập trong pnpm workspace:
 
 | App | Local | Production ví dụ |

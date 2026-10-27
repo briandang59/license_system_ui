@@ -1,4 +1,5 @@
 "use client";
+import DataTransferActions from "@/features/data-transfer/actions";
 
 import { useState } from "react";
 import { Alert, App, Button, ConfigProvider, Modal } from "antd";
@@ -60,6 +61,7 @@ export default function PlanFeaturesModal({ plan, onClose }: { plan: Plan; onClo
       closable={!save.isPending} keyboard={!save.isPending} mask={{ closable: !save.isPending }}
       onCancel={() => { if (!save.isPending) onClose(); }}>
       <p className="mt-3 mb-5 max-w-xl text-sm leading-6 text-muted">Choose what this plan includes. Select a feature to set its availability and usage limit.</p>
+      <div className="mb-4"><DataTransferActions resource="plan-features" parentId={plan.id} filters={{plan_id:String(plan.id)}} /></div>
       {assigned.isError && <div role="alert" className="mb-4">
         <Alert type="error" title={getApiErrorMessage(assigned.error)}
           action={assigned.isError ? <Button onClick={() => void assigned.refetch()}>Retry</Button> : undefined} />

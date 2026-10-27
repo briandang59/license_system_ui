@@ -1,4 +1,5 @@
 "use client";
+import DataTransferActions from "@/features/data-transfer/actions";
 import { useState, type Key } from "react";
 import { Alert, App, Button, Descriptions, Input, Modal, Spin, Table, } from "antd";
 import { Plus, Search, RotateCw, ChevronLeft, ChevronRight } from "lucide-react";
@@ -65,7 +66,7 @@ export default function UnitsPage() {
             setOffset(0);
             setSelectedRowKeys([]);
         }}/>
-        <span className="text-sm text-muted" aria-live="polite">{selectedRowKeys.length} selected</span>
+        <div className="flex flex-wrap items-center gap-3"><DataTransferActions resource="units" filters={{search}} /><span className="text-sm text-muted" aria-live="polite">{selectedRowKeys.length} selected</span></div>
       </div>
       <Table<Unit> rowKey="id" rowSelection={{
             type: "checkbox",

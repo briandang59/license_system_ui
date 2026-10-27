@@ -1,4 +1,5 @@
 "use client";
+import DataTransferActions from "@/features/data-transfer/actions";
 import PricingPanel from "@/features/pricing/panel";
 
 import { useState, type Key } from "react";
@@ -99,7 +100,7 @@ export default function FeaturesPage() {
             setSelectedRowKeys([]);
           }}
         />
-        <span className="text-sm text-muted" aria-live="polite">{selectedRowKeys.length} selected</span>
+        <div className="flex flex-wrap items-center gap-3"><DataTransferActions resource="features" filters={{search}} /><span className="text-sm text-muted" aria-live="polite">{selectedRowKeys.length} selected</span></div>
       </div>
       <Table<Feature>
         rowKey="id"
