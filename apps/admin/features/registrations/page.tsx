@@ -28,7 +28,7 @@ export default function RegistrationsPage() {
  <h2 className="my-4 text-lg font-semibold">Lịch sử báo giá</h2>
  {!r.quotes.length && <p>Chưa có báo giá.</p>}
  {r.quotes.map(q => <details key={q.id} className="mb-4"><summary>Phiên bản {q.version} · {q.total_minor.toLocaleString("en-US")} minor units {q.currency} · {q.accepted_at ? "Đã xác nhận" : q.version !== r.quotes[0].version ? "Đã thay thế" : "Chờ xác nhận"}</summary><ul>{q.lines.map((l, i) => <li key={i}>{l.description}: {l.quantity} × {l.unit_amount_minor.toLocaleString("en-US")} minor units</li>)}</ul><p className="whitespace-pre-wrap">{q.terms}</p><p>Hiệu lực đến: {formatDateTime(q.expires_at)}</p></details>)}
- {r.status === "accepted" ? <Alert type="success" title="Khách đã xác nhận báo giá. Tiếp tục quy trình thanh toán và tạo đăng ký dịch vụ trong admin." /> : <><h2 className="my-4 text-lg font-semibold">Lập báo giá</h2><QuoteForm key={`${r.id}-${r.quotes[0]?.version ?? 0}`} registration={r} onSaved={() => setSelected(null)} /></>}
+ {r.status === "accepted" ? <Alert type="success" title="Khách đã xác nhận báo giá. Xem đăng ký dịch vụ và khoản cần thu tương ứng trong mục Thanh toán." /> : <><h2 className="my-4 text-lg font-semibold">Lập báo giá</h2><QuoteForm key={`${r.id}-${r.quotes[0]?.version ?? 0}`} registration={r} onSaved={() => setSelected(null)} /></>}
  </>}
  </Modal></>;
 }

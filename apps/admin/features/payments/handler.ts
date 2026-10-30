@@ -1,0 +1,9 @@
+import { forwardAdminRequest } from "@/lib/admin-request";
+import { entitlementListSchema } from "./schema";
+import { paymentRequestSchema, paymentRequestListSchema, transactionListSchema, manualPaymentSchema, paymentResultSchema, reviewPaymentSchema, changeInputSchema, changeSchema, changeListSchema } from "./schema";
+export function handlePaymentRequest(request: Request, id?: string) { return forwardAdminRequest(request, { path: `/payment-requests${id ? `/${id}` : ""}`, ids: id ? [id] : [], methods: ["GET"], response: id ? paymentRequestSchema : paymentRequestListSchema, paginated: !id, queryKeys: ["status", "subscription_id"] }); }
+export function handleManualPayment(request: Request, id: string) { return forwardAdminRequest(request, { path: `/payment-requests/${id}/transactions`, ids: [id], methods: ["POST"], input: manualPaymentSchema, response: paymentResultSchema }); }
+export function handlePaymentTransactions(request: Request) { return forwardAdminRequest(request, { path: "/payment-transactions", methods: ["GET"], response: transactionListSchema, paginated: true, queryKeys: ["payment_request_id", "status"] }); }
+export function handlePaymentReview(request: Request, id: string) { return forwardAdminRequest(request, { path: `/payment-transactions/${id}/review`, ids: [id], methods: ["POST"], input: reviewPaymentSchema, response: paymentResultSchema }); }
+export function handleSubscriptionChanges(request: Request, id: string) { return forwardAdminRequest(request, { path: `/subscriptions/${id}/changes`, ids: [id], methods: ["GET", "POST"], input: changeInputSchema, response: request.method === "GET" ? changeListSchema : changeSchema, paginated: true }); }
+export function handleSubscriptionEntitlements(request: Request, id: string) { return forwardAdminRequest(request, { path: `/subscriptions/${id}/entitlements`, ids: [id], methods: ["GET"], response: entitlementListSchema, paginated: true }); }

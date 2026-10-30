@@ -11,7 +11,7 @@ export const registrationInputSchema = z.object({
 export const receiptSchema = z.object({ reference: z.string(), status: z.enum(["pending", "quoted", "accepted"]) });
 export const tokenSchema = z.object({ token: z.string().regex(/^[a-f0-9]{64}$/) }).strict();
 export const quoteLineSchema = z.object({ description: z.string().trim().min(1).max(1000), quantity: z.number().int().min(1).max(1000000), unit_amount_minor: amount }).strict();
-export const quoteSchema = z.object({ id, registration_id: id, version: z.number().int().positive(), lines: z.array(quoteLineSchema).min(1).max(100), total_minor: amount, currency: z.string().regex(/^[A-Z]{3}$/), billing_interval: z.enum(["month", "year", "one_time"]), terms: z.string(), expires_at: z.iso.datetime({ offset: true }), accepted_at: z.iso.datetime({ offset: true }).nullable(), created_at: z.iso.datetime({ offset: true }) });
+export const quoteSchema = z.object({ payment: z.object({ code: z.string(), amount_minor: amount, paid_minor: amount, currency: z.string(), status: z.enum(["pending", "partially_paid", "paid", "cancelled"]) }).nullable().optional(), id, registration_id: id, version: z.number().int().positive(), lines: z.array(quoteLineSchema).min(1).max(100), total_minor: amount, currency: z.string().regex(/^[A-Z]{3}$/), billing_interval: z.enum(["month", "year", "one_time"]), terms: z.string(), expires_at: z.iso.datetime({ offset: true }), accepted_at: z.iso.datetime({ offset: true }).nullable(), created_at: z.iso.datetime({ offset: true }) });
 export type RegistrationInput = z.infer<typeof registrationInputSchema>;
 export type Quote = z.infer<typeof quoteSchema>;
 

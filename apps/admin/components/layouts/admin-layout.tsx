@@ -22,6 +22,7 @@ const items = [
       { key: "/plans", icon: <Layers3 size={17} aria-hidden="true" />, label: <Link href="/plans">Gói dịch vụ</Link> },
       { key: "/units", icon: <Ruler size={17} aria-hidden="true" />, label: <Link href="/units">Đơn vị tính</Link> },
       { key: "/registrations", icon: <CalendarCheck size={17} aria-hidden="true" />, label: <Link href="/registrations">Yêu cầu & báo giá</Link> },
+      { key: "/payments", icon: <CalendarCheck size={17} aria-hidden="true" />, label: <Link href="/payments">Thanh toán</Link> },
       { key: "/subscriptions", icon: <CalendarCheck size={17} aria-hidden="true" />, label: <Link href="/subscriptions">Đăng ký dịch vụ</Link> },
       { key: "/features", icon: <Puzzle size={17} aria-hidden="true" />, label: <Link href="/features">Tính năng</Link> },
     ],
