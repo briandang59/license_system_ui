@@ -12,7 +12,7 @@ export default function FeatureSelect<T extends FieldValues>({
   featureId,
   productId,
   ...props
-}: Pick<ComponentProps<typeof FormSelect<T>>, "control" | "name" | "label" | "disabled"> & { featureId?: number; productId?: number }) {
+}: Pick<ComponentProps<typeof FormSelect<T>>, "control" | "name" | "label" | "required" | "disabled"> & { featureId?: number; productId?: number }) {
   const features = useInfiniteQuery({
     queryKey: ["features", "options"],
     initialPageParam: 0,

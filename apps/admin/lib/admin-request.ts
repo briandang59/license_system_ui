@@ -37,6 +37,9 @@ export async function forwardAdminRequest(request: Request, options: Options) {
             return failure(400, "VALIDATION_ERROR");
         query.set("limit", "20");
         query.set("offset", offset);
+    }
+    if (method === "GET") {
+        if ([...(params.get("search") ?? "")].length > 200) return failure(400, "VALIDATION_ERROR");
         for (const key of options.queryKeys ?? []) {
             const value = params.get(key)?.trim();
             if (value)

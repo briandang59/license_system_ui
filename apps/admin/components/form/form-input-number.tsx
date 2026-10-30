@@ -8,9 +8,9 @@ import { formatNumberInput, parseNumber } from "@/utils/functions/formatNumber";
 
 type Props<T extends FieldValues> = FormControlProps<T, number | null> & ControlProps<InputNumberProps<number>>;
 
-export default function FormInputNumber<T extends FieldValues>({ control, name, label, disabled, ...props }: Props<T>) {
+export default function FormInputNumber<T extends FieldValues>({ control, name, label, disabled, required, ...props }: Props<T>) {
   return (
-    <FormField<T, number | null> control={control} name={name} label={label} disabled={disabled}>
+    <FormField<T, number | null> control={control} name={name} label={label} disabled={disabled} required={required}>
       {(field, a11y) => <InputNumber formatter={formatNumberInput}
         parser={parseNumber} {...props} {...field} {...a11y} style={{ width: "100%", ...props.style }} />}
     </FormField>

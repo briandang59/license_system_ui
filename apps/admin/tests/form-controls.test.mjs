@@ -106,3 +106,10 @@ test("form controls preserve values and bind change, blur, disabled and accessib
     assert.deepEqual(methods.getValues("field"), initial, slug);
   }
 });
+
+
+test("required controls render a required marker and expose the same requirement to assistive technology", () => {
+ const FormField=load("components/form/form-field.tsx");const Input=load("components/form/form-input.tsx",{"./form-field":FormField}).default;
+ function Example(){const {control}=useForm({defaultValues:{name:"",description:""}});return createElement("form",null,createElement(Input,{control,name:"name",label:"Tên bắt buộc",required:true}),createElement(Input,{control,name:"description",label:"Mô tả tùy chọn"}));}
+ const html=renderToStaticMarkup(createElement(Example));assert.match(html,/ant-form-item-required/);assert.match(html,/aria-required="true"/);assert.match(html,/aria-required="false"/);assert.equal((html.match(/class="ant-form-item-required"/g)??[]).length,1);
+});

@@ -59,13 +59,13 @@ export const ProductForm = ({
       })}
     >
       <FormInput
-        control={control}
+        required control={control}
         name="code"
         label="Mã"
         disabled={!!product || save.isPending}
       />
       <FormInput
-        control={control}
+        required control={control}
         name="name"
         label="Tên"
         disabled={save.isPending}
@@ -78,7 +78,7 @@ export const ProductForm = ({
         rows={3}
       />
       <FormSelect
-        control={control}
+        required control={control}
         name="status"
         label="Trạng thái"
         disabled={save.isPending}

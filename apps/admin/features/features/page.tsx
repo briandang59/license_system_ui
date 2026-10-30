@@ -59,7 +59,7 @@ export default function FeaturesPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">Tính năng</h1>
           <p className="mt-2 text-sm text-muted">
@@ -91,7 +91,7 @@ export default function FeaturesPage() {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <Input.Search
           aria-label="Tìm tính năng"
-          placeholder="Tìm theo tên hoặc mã"
+          placeholder="Tên, mã, sản phẩm, loại hoặc đơn vị tính"
           allowClear
           style={{ maxWidth: 420 }}
           enterButton={<Button aria-label="Tìm tính năng" title="Tìm tính năng" icon={<Search size={16} aria-hidden="true" />} />}

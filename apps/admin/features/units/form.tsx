@@ -40,10 +40,10 @@ export function UnitForm({ unit, onSaved }: {
     });
     return (<form noValidate onSubmit={handleSubmit((data) => { if (!save.isPending)
         save.mutate(data); })}>
-      <FormInput control={control} name="code" label="Mã" disabled={save.isPending}/>
-      <FormInput control={control} name="name" label="Tên" disabled={save.isPending}/>
+      <FormInput required control={control} name="code" label="Mã" disabled={save.isPending}/>
+      <FormInput required control={control} name="name" label="Tên" disabled={save.isPending}/>
       <FormInput control={control} name="symbol" label="Ký hiệu" disabled={save.isPending}/>
-      <FormSelect control={control} name="status" label="Trạng thái" disabled={save.isPending} options={[{ value: "active", label: "Hoạt động" }, { value: "inactive", label: "Ngừng hoạt động" }]}/>
+      <FormSelect required control={control} name="status" label="Trạng thái" disabled={save.isPending} options={[{ value: "active", label: "Hoạt động" }, { value: "inactive", label: "Ngừng hoạt động" }]}/>
       <Button htmlType="submit" type="primary" loading={save.isPending} block>
         {unit ? "Lưu thay đổi" : "Tạo đơn vị tính"}
       </Button>

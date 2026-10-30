@@ -7,9 +7,9 @@ import FormField, { type FormControlProps, type ControlProps } from "./form-fiel
 
 type Props<T extends FieldValues> = FormControlProps<T, Dayjs | null> & ControlProps<TimePickerProps>;
 
-export default function FormTimePicker<T extends FieldValues>({ control, name, label, disabled, ...props }: Props<T>) {
+export default function FormTimePicker<T extends FieldValues>({ control, name, label, disabled, required, ...props }: Props<T>) {
   return (
-    <FormField<T, Dayjs | null> control={control} name={name} label={label} disabled={disabled}>
+    <FormField<T, Dayjs | null> control={control} name={name} label={label} disabled={disabled} required={required}>
       {(field, a11y) => <TimePicker {...props} {...field} {...a11y} style={{ width: "100%", ...props.style }} />}
     </FormField>
   );

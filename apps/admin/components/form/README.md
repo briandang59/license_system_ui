@@ -8,11 +8,12 @@ import FormSelect from "@/components/form/form-select";
 <FormSelect
   control={control}
   name="status"
-  label="Status"
+  label="Trạng thái"
+  required
   disabled={save.isPending}
   options={[
-    { value: "active", label: "Active" },
-    { value: "inactive", label: "Inactive" },
+    { value: "active", label: "Hoạt động" },
+    { value: "inactive", label: "Ngừng hoạt động" },
   ]}
 ```
 
@@ -44,3 +45,6 @@ InputNumber mặc định phân cách hàng nghìn bằng dấu phẩy (20,000,0
 Upload không tự gửi HTTP request: `beforeUpload` luôn trả `false`, danh sách file được lưu trong form. Khi submit, kiểm tra kiểu/kích thước file và gửi `originFileObj` bằng FormData ở service theo contract backend. `accept` chỉ hỗ trợ lọc file trong hộp chọn, không thay thế validation phía client/server.
 
 Không dùng `FormField` để tạo form state thứ hai. Khi cần một loại control mới, dùng nó để giữ cách hiển thị label/lỗi thống nhất; `FormField` là phần nội bộ, các trang nên dùng `Form*` cụ thể.
+
+
+Truyền `required` cho trường mà schema yêu cầu nhập; FormField hiển thị dấu * đỏ bằng Ant Design và đặt aria-required cho control. Với quy tắc có điều kiện, dùng cùng điều kiện với validation (ví dụ tài khoản/tham chiếu chỉ bắt buộc khi chuyển khoản). Field tùy chọn không truyền required. Dấu này không thay thế kiểm tra Zod/backend. Khoảng cách giữa các field là 20px.

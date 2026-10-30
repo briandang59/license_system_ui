@@ -11,13 +11,13 @@ export default function FormInput<T extends FieldValues>({
   name,
   label,
   type = "text",
-  disabled,
+  disabled, required,
   ...props
 }: FormInputProps<T>) {
   const Component = type === "password" ? Input.Password : Input;
 
   return (
-    <FormField<T, string> control={control} name={name} label={label} disabled={disabled}>
+    <FormField<T, string> control={control} name={name} label={label} disabled={disabled} required={required}>
       {(field, a11y) => <Component {...props} {...field} {...a11y} type={type} />}
     </FormField>
   );

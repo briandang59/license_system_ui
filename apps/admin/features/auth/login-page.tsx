@@ -48,7 +48,7 @@ export default function LoginPage() {
             })}
           >
             <FormInput
-              control={control}
+              required control={control}
               name="email"
               label="Địa chỉ email"
               type="email"
@@ -57,7 +57,7 @@ export default function LoginPage() {
               size="large"
             />
             <FormInput
-              control={control}
+              required control={control}
               name="password"
               label="Mật khẩu"
               type="password"

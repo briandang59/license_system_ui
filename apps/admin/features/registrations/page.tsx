@@ -6,15 +6,18 @@ import { useQuery } from "@tanstack/react-query";
 import { getApiErrorMessage } from "@/lib/api-errors";
 import { formatDateTime } from "@/utils/functions/formatDateTime";
 import { registrationService } from "./service";
+import SearchField from "@/components/ui/search-field";
+import PageHeader from "@/components/ui/page-header";
 import QuoteForm from "./quote-form";
 import type { Registration } from "./schema";
 const labels = { pending: "Chờ xử lý", quoted: "Đã lập báo giá", accepted: "Đã xác nhận" };
 export default function RegistrationsPage() {
+ const [search, setSearch] = useState("");
  const [offset, setOffset] = useState(0); const [selected, setSelected] = useState<number | null>(null);
- const list = useQuery({ queryKey: ["registrations", offset], queryFn: ({ signal }) => registrationService.list(offset, signal) });
+ const list = useQuery({ queryKey: ["registrations", offset, search], queryFn: ({ signal }) => registrationService.list(offset, signal, search) });
  const detail = useQuery({ queryKey: ["registrations", "detail", selected], queryFn: ({ signal }) => registrationService.detail(selected!, signal), enabled: selected !== null, refetchInterval: selected === null ? false : 15000 });
  const r = detail.data;
- return <><h1 className="mb-4 text-2xl font-semibold">Yêu cầu & báo giá</h1><p className="mb-6 text-muted">Tiếp nhận đăng ký, cấu hình gói custom và gửi báo giá cho doanh nghiệp.</p>
+ return <><PageHeader title="Yêu cầu & báo giá" description="Tiếp nhận đăng ký, cấu hình gói custom và gửi báo giá cho doanh nghiệp." /><div className="mb-4 flex flex-wrap gap-3"><SearchField label="Tìm yêu cầu và báo giá" placeholder="Mã yêu cầu, doanh nghiệp, liên hệ, email, điện thoại…" onSearch={v => { setSearch(v); setOffset(0); }} /></div>
  {list.isError && <Alert type="error" title={getApiErrorMessage(list.error)} action={<Button onClick={() => void list.refetch()}>Thử lại</Button>} />}
  <Table<Registration> loading={list.isPending} rowKey="id" dataSource={list.data?.items ?? []} pagination={false} scroll={{ x: 750 }} columns={[{ title: "#", render: (_, __, i) => offset + i + 1 }, { title: "Mã yêu cầu", dataIndex: "reference" }, { title: "Công ty", dataIndex: "company_name" }, { title: "Liên hệ", render: (_, row) => <>{row.contact_name}<br />{row.email}</> }, { title: "Trạng thái", render: (_, row) => <Tag>{labels[row.status]}</Tag> }, { title: "Ngày đăng ký", render: (_, row) => formatDateTime(row.created_at) }, { title: "Thao tác", render: (_, row) => <Button icon={<Eye size={16} aria-hidden />} aria-label={`Xem yêu cầu ${row.reference}`} title="Xem và lập báo giá" onClick={() => setSelected(row.id)} /> }]} />
  <Space className="mt-4"><Button disabled={offset === 0 || list.isFetching} onClick={() => setOffset(v => v - 20)}>Trang trước</Button><Button disabled={!list.data || list.data.items.length < 20 || list.isFetching} onClick={() => setOffset(v => v + 20)}>Trang sau</Button><Button onClick={() => void list.refetch()}>Tải lại</Button></Space>

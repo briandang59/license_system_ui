@@ -1,0 +1,10 @@
+import { z } from "zod";
+const count = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
+const money = z.string().regex(/^\d+$/);
+const currency = z.string().regex(/^[A-Z]{3}$/);
+const stamp = z.iso.datetime({ offset: true });
+export const dashboardQuerySchema = z.object({ from: stamp.optional(), to: stamp.optional(), search: z.string().trim().max(200).optional() }).refine(v => (!v.from && !v.to) || (!!v.from && !!v.to && Date.parse(v.to) > Date.parse(v.from) && Date.parse(v.to)-Date.parse(v.from) <= 366*86400000));
+export const receiptSchema = z.object({ id: count.positive(), received_at: stamp, amount_minor: money, currency, source: z.enum(["manual", "sepay"]), payment_code: z.string(), company_name: z.string(), plan_name: z.string() });
+export const dashboardSchema = z.object({ from: stamp, to: stamp, calculated_at: stamp, counts: z.object({ companies: count, active_subscriptions: count, pending_subscriptions: count, expiring_subscriptions: count, open_registrations: count, pending_review: count }), money: z.array(z.object({ currency, received_minor: money, manual_minor: money, sepay_minor: money, receipt_count: count, outstanding_minor: money, outstanding_requests: count })), daily: z.array(z.object({ day: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), currency, amount_minor: money })), recent: z.array(receiptSchema) });
+export type Dashboard = z.infer<typeof dashboardSchema>;
+export type Receipt = z.infer<typeof receiptSchema>;

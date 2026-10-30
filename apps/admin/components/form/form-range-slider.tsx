@@ -7,9 +7,9 @@ import FormField, { type FormControlProps, type ControlProps } from "./form-fiel
 
 type Props<T extends FieldValues> = FormControlProps<T, number[]> & ControlProps<SliderRangeProps>;
 
-export default function FormRangeSlider<T extends FieldValues>({ control, name, label, disabled, ...props }: Props<T>) {
+export default function FormRangeSlider<T extends FieldValues>({ control, name, label, disabled, required, ...props }: Props<T>) {
   return (
-    <FormField<T, number[]> control={control} name={name} label={label} disabled={disabled}>
+    <FormField<T, number[]> control={control} name={name} label={label} disabled={disabled} required={required}>
       {(field, a11y) => <Slider {...props} {...field} {...a11y} range ariaLabelledByForHandle={a11y["aria-labelledby"]} />}
     </FormField>
   );

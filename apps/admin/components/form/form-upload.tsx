@@ -7,9 +7,9 @@ import FormField, { type FormControlProps, type ControlProps } from "./form-fiel
 type Props<T extends FieldValues> = FormControlProps<T, UploadFile[]> &
   Omit<ControlProps<UploadProps>, "fileList" | "defaultFileList" | "beforeUpload" | "action" | "customRequest">;
 
-export default function FormUpload<T extends FieldValues>({ control, name, label, disabled, children, ...props }: Props<T>) {
+export default function FormUpload<T extends FieldValues>({ control, name, label, disabled, required, children, ...props }: Props<T>) {
   return (
-    <FormField<T, UploadFile[]> control={control} name={name} label={label} disabled={disabled}>
+    <FormField<T, UploadFile[]> control={control} name={name} label={label} disabled={disabled} required={required}>
       {(field, a11y) => (
         <Upload
           {...props}

@@ -8,9 +8,9 @@ import { dateTimeFormat, pickerToVietnam } from "@/utils/functions/formatDateTim
 
 type Props<T extends FieldValues> = FormControlProps<T, Dayjs | null> & ControlProps<DatePickerProps<Dayjs, false>>;
 
-export default function FormDatePicker<T extends FieldValues>({ control, name, label, disabled, ...props }: Props<T>) {
+export default function FormDatePicker<T extends FieldValues>({ control, name, label, disabled, required, ...props }: Props<T>) {
   return (
-    <FormField<T, Dayjs | null> control={control} name={name} label={label} disabled={disabled}>
+    <FormField<T, Dayjs | null> control={control} name={name} label={label} disabled={disabled} required={required}>
       {(field, a11y) => <DatePicker format={props.showTime ? dateTimeFormat : "DD/MM/YYYY"} {...props} {...field} {...a11y}
         onChange={value => field.onChange(pickerToVietnam(value))} style={{ width: "100%", ...props.style }} />}
     </FormField>

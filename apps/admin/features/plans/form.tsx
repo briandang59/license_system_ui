@@ -66,11 +66,11 @@ export function PlanForm({ plan, onSaved, onPendingChange }: { plan?: Plan; onSa
   }, [save.isPending, onPendingChange]);
   return (<FormProvider {...form}>
     <form noValidate onSubmit={handleSubmit((data) => { if (!save.isPending) save.mutate(data); })}>
-      <ProductSelect control={control} name="product_id" label="Sản phẩm" productId={plan?.product_id} disabled={!!savedId || save.isPending} />
-      <FormInput control={control} name="code" label="Mã" disabled={!!savedId || save.isPending} />
-      <FormInput control={control} name="name" label="Tên" disabled={save.isPending} />
+      <ProductSelect required control={control} name="product_id" label="Sản phẩm" productId={plan?.product_id} disabled={!!savedId || save.isPending} />
+      <FormInput required control={control} name="code" label="Mã" disabled={!!savedId || save.isPending} />
+      <FormInput required control={control} name="name" label="Tên" disabled={save.isPending} />
       <FormTextarea control={control} name="description" label="Mô tả" disabled={save.isPending} rows={3} />
-      <FormSelect control={control} name="status" label="Trạng thái" disabled={save.isPending}
+      <FormSelect required control={control} name="status" label="Trạng thái" disabled={save.isPending}
         options={[{ value: "active", label: "Hoạt động" }, { value: "inactive", label: "Ngừng hoạt động" }]} />
       <PriceEntryFields disabled={save.isPending} existing={!!savedId} />
       {save.isError && partial && <p role="status" className="mb-4 text-sm text-muted">Thông tin gói đã lưu. Các dòng giá chưa lưu được giữ lại; bấm lưu để thử lại.</p>}

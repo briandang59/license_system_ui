@@ -35,13 +35,13 @@ export default function PriceEntryFields({ disabled, existing }: { disabled: boo
           aria-label={`Bỏ dòng giá ${index + 1}`} onClick={() => remove(index)} />
       </legend>
       <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-        <FormInputNumber control={control} name={`prices.${index}.amount_minor`} label="Số tiền (đơn vị nhỏ nhất)" min={0} max={Number.MAX_SAFE_INTEGER} precision={0} disabled={disabled} />
-        <FormInput control={control} name={`prices.${index}.currency`} label="Tiền tệ" maxLength={3} placeholder="VND, USD…" disabled={disabled} />
-        <FormSelect control={control} name={`prices.${index}.billing_interval`} label="Chu kỳ thanh toán" disabled={disabled}
+        <FormInputNumber required control={control} name={`prices.${index}.amount_minor`} label="Số tiền (đơn vị nhỏ nhất)" min={0} max={Number.MAX_SAFE_INTEGER} precision={0} disabled={disabled} />
+        <FormInput required control={control} name={`prices.${index}.currency`} label="Tiền tệ" maxLength={3} placeholder="VND, USD…" disabled={disabled} />
+        <FormSelect required control={control} name={`prices.${index}.billing_interval`} label="Chu kỳ thanh toán" disabled={disabled}
           options={[{ value: "month", label: "Hàng tháng" }, { value: "year", label: "Hàng năm" }, { value: "one_time", label: "Một lần" }]} />
-        <FormSelect control={control} name={`prices.${index}.status`} label="Trạng thái giá" disabled={disabled}
+        <FormSelect required control={control} name={`prices.${index}.status`} label="Trạng thái giá" disabled={disabled}
           options={[{ value: "active", label: "Hoạt động" }, { value: "inactive", label: "Ngừng hoạt động" }]} />
-        <FormDatePicker control={control} name={`prices.${index}.effective_from`} label="Hiệu lực từ (giờ Việt Nam)" showTime disabled={disabled} />
+        <FormDatePicker required control={control} name={`prices.${index}.effective_from`} label="Hiệu lực từ (giờ Việt Nam)" showTime disabled={disabled} />
         <FormDatePicker control={control} name={`prices.${index}.effective_to`} label="Hiệu lực đến (giờ Việt Nam, có thể để trống)" showTime disabled={disabled} />
       </div>
     </fieldset>)}

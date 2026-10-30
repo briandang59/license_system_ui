@@ -11,7 +11,7 @@ import { getApiErrorMessage } from "@/lib/api-errors";
 export default function CompanySelect<T extends FieldValues>({
   companyId,
   ...props
-}: Pick<ComponentProps<typeof FormSelect<T>>, "control" | "name" | "label" | "disabled"> & { companyId?: number }) {
+}: Pick<ComponentProps<typeof FormSelect<T>>, "control" | "name" | "label" | "required" | "disabled"> & { companyId?: number }) {
   const companies = useInfiniteQuery({
     queryKey: ["companies", "options"],
     initialPageParam: 0,

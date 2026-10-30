@@ -6,7 +6,7 @@ import type { ComponentProps } from "react";
 import FormSelect from "@/components/form/form-select";
 import { unitService } from "@/features/units/service";
 import { getApiErrorMessage } from "@/lib/api-errors";
-export default function UnitSelect<T extends FieldValues>({ unitId, ...props }: Pick<ComponentProps<typeof FormSelect<T>>, "control" | "name" | "label" | "disabled" | "allowClear"> & {
+export default function UnitSelect<T extends FieldValues>({ unitId, ...props }: Pick<ComponentProps<typeof FormSelect<T>>, "control" | "name" | "label" | "required" | "disabled" | "allowClear"> & {
     unitId?: number;
 }) {
     const units = useInfiniteQuery({

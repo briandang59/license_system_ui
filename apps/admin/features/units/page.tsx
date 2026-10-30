@@ -42,7 +42,7 @@ export default function UnitsPage() {
         },
     });
     return (<div>
-      <div className="mb-6 flex items-center justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">Đơn vị tính</h1>
           <p className="mt-2 text-sm text-muted">
@@ -61,7 +61,7 @@ export default function UnitsPage() {
               </Button>}/>
         </div>)}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <Input.Search aria-label="Tìm đơn vị tính" placeholder="Tìm theo tên hoặc mã" allowClear style={{ maxWidth: 420 }} enterButton={<Button aria-label="Tìm đơn vị tính" title="Tìm đơn vị tính" icon={<Search size={16} aria-hidden="true"/>}/>} onSearch={(value) => {
+        <Input.Search aria-label="Tìm đơn vị tính" placeholder="Tên, mã, ký hiệu hoặc trạng thái" allowClear style={{ maxWidth: 420 }} enterButton={<Button aria-label="Tìm đơn vị tính" title="Tìm đơn vị tính" icon={<Search size={16} aria-hidden="true"/>}/>} onSearch={(value) => {
             setSearch(value.trim());
             setOffset(0);
             setSelectedRowKeys([]);

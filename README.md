@@ -75,3 +75,10 @@ backend trên host. Cấu hình APP_ORIGIN phải khớp scheme/host/port công 
 có dấu `/` cuối. Backend cần lắng nghe interface mà container truy cập được.
 
 Thiết kế, contract và evidence: [public pricing — 20261027](docs/20261027_public_pricing.md).
+
+
+## Tổng quan, tìm kiếm và biểu mẫu — 20261030
+
+Menu quản trị chia **Nghiệp vụ** và **Danh mục** (Sản phẩm, Doanh nghiệp, Gói dịch vụ, Đơn vị tính). Các trang danh sách có tìm kiếm nhiều cột ở backend; submit/clear đặt lại phân trang. Trường bắt buộc có dấu * màu đỏ và aria-required, gồm điều kiện chuyển khoản/đối soát.
+
+Tổng quan dùng số liệu thật từ API dashboard: doanh thu thực thu theo tháng, còn phải thu hiện tại, nguồn manual/SePay, biểu đồ ngày và giao dịch gần nhất; tách riêng từng tiền tệ. Cần triển khai backend có GET /api/v1/dashboard và GET /api/v1/licenses trước frontend này. Xem [thiết kế, contract và kiểm thử](docs/20261030_admin_search_dashboard.md).

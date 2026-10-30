@@ -7,7 +7,7 @@ import type { ComponentProps } from "react";
 import type { FieldValues } from "react-hook-form";
 import FormSelect from "@/components/form/form-select";
 import { priceService } from "./service";
-export default function PriceSelect<T extends FieldValues>({ kind, parent, startDate, currency, interval, ...props }: Pick<ComponentProps<typeof FormSelect<T>>, "control" | "name" | "label" | "disabled" | "allowClear"> & {
+export default function PriceSelect<T extends FieldValues>({ kind, parent, startDate, currency, interval, ...props }: Pick<ComponentProps<typeof FormSelect<T>>, "control" | "name" | "label" | "required" | "disabled" | "allowClear"> & {
     kind: "plans" | "features";
     parent?: number;
     startDate: string;

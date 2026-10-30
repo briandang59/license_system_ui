@@ -11,22 +11,19 @@ import { displayLabel } from "@/lib/display-labels";
 
 const items = [
   { key: "/", icon: <LayoutDashboard size={17} aria-hidden="true" />, label: <Link href="/">Tổng quan</Link> },
-  {
-    key: "catalogs",
-    label: "Danh mục",
-    type: "group" as const,
-    children: [
-      { key: "/licenses", icon: <ShieldCheck size={17} aria-hidden="true" />, label: <Link href="/licenses">Bản quyền</Link> },
-      { key: "/products", icon: <Package size={17} aria-hidden="true" />, label: <Link href="/products">Sản phẩm</Link> },
-      { key: "/companies", icon: <Building2 size={17} aria-hidden="true" />, label: <Link href="/companies">Doanh nghiệp</Link> },
-      { key: "/plans", icon: <Layers3 size={17} aria-hidden="true" />, label: <Link href="/plans">Gói dịch vụ</Link> },
-      { key: "/units", icon: <Ruler size={17} aria-hidden="true" />, label: <Link href="/units">Đơn vị tính</Link> },
-      { key: "/registrations", icon: <CalendarCheck size={17} aria-hidden="true" />, label: <Link href="/registrations">Yêu cầu & báo giá</Link> },
-      { key: "/payments", icon: <CalendarCheck size={17} aria-hidden="true" />, label: <Link href="/payments">Thanh toán</Link> },
-      { key: "/subscriptions", icon: <CalendarCheck size={17} aria-hidden="true" />, label: <Link href="/subscriptions">Đăng ký dịch vụ</Link> },
-      { key: "/features", icon: <Puzzle size={17} aria-hidden="true" />, label: <Link href="/features">Tính năng</Link> },
-    ],
-  },
+  { key: "operations", label: "Nghiệp vụ", type: "group" as const, children: [
+    { key: "/registrations", icon: <CalendarCheck size={17} aria-hidden="true" />, label: <Link href="/registrations">Yêu cầu & báo giá</Link> },
+    { key: "/subscriptions", icon: <CalendarCheck size={17} aria-hidden="true" />, label: <Link href="/subscriptions">Đăng ký dịch vụ</Link> },
+    { key: "/payments", icon: <CalendarCheck size={17} aria-hidden="true" />, label: <Link href="/payments">Thanh toán</Link> },
+    { key: "/licenses", icon: <ShieldCheck size={17} aria-hidden="true" />, label: <Link href="/licenses">Bản quyền</Link> },
+    { key: "/features", icon: <Puzzle size={17} aria-hidden="true" />, label: <Link href="/features">Tính năng</Link> },
+  ] },
+  { key: "catalogs", label: "Danh mục", type: "group" as const, children: [
+    { key: "/products", icon: <Package size={17} aria-hidden="true" />, label: <Link href="/products">Sản phẩm</Link> },
+    { key: "/companies", icon: <Building2 size={17} aria-hidden="true" />, label: <Link href="/companies">Doanh nghiệp</Link> },
+    { key: "/plans", icon: <Layers3 size={17} aria-hidden="true" />, label: <Link href="/plans">Gói dịch vụ</Link> },
+    { key: "/units", icon: <Ruler size={17} aria-hidden="true" />, label: <Link href="/units">Đơn vị tính</Link> },
+  ] },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
